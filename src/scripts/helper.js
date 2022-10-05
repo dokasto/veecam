@@ -103,5 +103,13 @@ function removeDeviceIDFromConstraint(valueOfAnyType, virtualDeviceId) {
 }
 
 function applyFilter(stream) {
+  /**
+   * - exposure
+   * - brilliance
+   * - contrast
+   * - brightness
+   * - saturation
+   * - vibrancy
+   */
   return stream;
 }
