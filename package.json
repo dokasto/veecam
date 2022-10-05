@@ -1,0 +1,11 @@
+{
+  "name": "VeeCam",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
+  },
+  "devDependencies": {
+    "rollup-plugin-terser": "^7.0.2"
+  }
+}
