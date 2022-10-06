@@ -104,12 +104,9 @@ function removeDeviceIDFromConstraint(valueOfAnyType, virtualDeviceId) {
 
 function applyFilter(stream) {
   /**
-   * - exposure
-   * - brilliance
-   * - contrast
-   * - brightness
-   * - saturation
-   * - vibrancy
+   * - Record meeting with full transcription
+   * - Raise hands in meetings
+   * - Playback a presentation
    */
   return stream;
 }
