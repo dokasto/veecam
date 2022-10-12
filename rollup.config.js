@@ -37,4 +37,13 @@ export default [
       format: "iife",
     },
   },
+  {
+    input: "src/scripts/options.js",
+    output: {
+      file: "build/options.js",
+      format: "cjs",
+      plugins: [terser()],
+      format: "iife",
+    },
+  },
 ];
