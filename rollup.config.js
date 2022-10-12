@@ -1,4 +1,10 @@
 import { terser } from "rollup-plugin-terser";
+import resolve from "@rollup/plugin-node-resolve";
+import { babel } from "@rollup/plugin-babel";
+import commonjs from "@rollup/plugin-commonjs";
+import replace from "@rollup/plugin-replace";
+import postcss from "rollup-plugin-postcss";
+import autoprefixer from "autoprefixer";
 
 export default [
   {
@@ -42,8 +48,24 @@ export default [
     output: {
       file: "build/options.js",
       format: "cjs",
-      plugins: [terser()],
       format: "iife",
     },
+    plugins: [
+      process.env.NODE_ENV === "production" && terser(),
+      resolve(),
+      babel({
+        exclude: "node_modules/**",
+        babelHelpers: "bundled",
+        presets: ["@babel/env", "@babel/preset-react"],
+        extensions: [".js"],
+      }),
+      commonjs(),
+      replace({
+        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+      }),
+      postcss({
+        plugins: [autoprefixer()],
+      }),
+    ],
   },
 ];
