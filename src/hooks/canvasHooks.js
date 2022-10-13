@@ -19,7 +19,7 @@ export function useRenderStreamToCanvas(canvas) {
   }, [canvas, stream]);
 
   useEffect(() => {
-    if (requestAnimationFrameRef.current != null || canvas == null) {
+    if (canvas == null) {
       return;
     }
 
@@ -42,6 +42,6 @@ export function useRenderStreamToCanvas(canvas) {
 
     requestAnimationFrameRef.current = window.requestAnimationFrame(render);
 
-    return () => window.cancelAnimationFrame(requestAnimationFrameRef);
+    return () => window.cancelAnimationFrame(requestAnimationFrameRef.current);
   }, [canvas]);
 }
