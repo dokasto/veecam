@@ -2,6 +2,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import VideoSource from "./VideoSource";
 import SelfView from "./SelfView";
+import DisplayControls from "./DisplayControls";
 
 const useStyles = createUseStyles({
   root: {
@@ -10,6 +11,7 @@ const useStyles = createUseStyles({
     border: "2px solid #7f8c8d",
     padding: 8,
     borderRadius: 8,
+    paddingLeft: 24,
   },
   preferences: {
     fontSize: 24,
@@ -20,11 +22,9 @@ const useStyles = createUseStyles({
     marginTop: 24,
   },
   camera: {
-    border: "1px solid blue",
     width: 700,
   },
-  colorCorrection: {
-    border: "2px solid green",
+  controls: {
     flex: 1,
   },
 });
@@ -39,7 +39,9 @@ export default function OptionsApp() {
           <VideoSource />
           <SelfView />
         </div>
-        <div className={classes.colorCorrection}>color correction</div>
+        <div className={classes.controls}>
+          <DisplayControls />
+        </div>
       </div>
       <div>filters</div>
     </div>

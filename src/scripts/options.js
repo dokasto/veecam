@@ -15,6 +15,24 @@ const useStyles = createUseStyles({
     "*": {
       boxSizing: "border-box",
     },
+    "input[type=range]": {
+      appearance: "none",
+      background: "transparent",
+    },
+    "input[type=range]::-webkit-slider-runnable-track": {
+      backgroundColor: "#ecf0f1",
+      borderRadius: 8,
+      width: 4,
+      cursor: "pointer",
+    },
+    "input[type=range]::-webkit-slider-thumb": {
+      background: "#2c3e50",
+      appearance: "none",
+      cursor: "pointer",
+      borderRadius: 8,
+      width: 20,
+      height: 20,
+    },
   },
   title: {
     display: "inline-block",
