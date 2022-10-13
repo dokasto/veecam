@@ -5,6 +5,8 @@ import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import postcss from "rollup-plugin-postcss";
 import autoprefixer from "autoprefixer";
+import json from "@rollup/plugin-json";
+import webWorkerLoader from "rollup-plugin-web-worker-loader";
 
 export default [
   {
@@ -13,7 +15,6 @@ export default [
       file: "build/contentScript.js",
       format: "cjs",
       plugins: [terser()],
-      format: "iife",
     },
   },
   {
@@ -22,7 +23,6 @@ export default [
       file: "build/background.js",
       format: "cjs",
       plugins: [terser()],
-      format: "iife",
     },
   },
   {
@@ -31,7 +31,6 @@ export default [
       file: "build/popup.js",
       format: "cjs",
       plugins: [terser()],
-      format: "iife",
     },
   },
   {
@@ -40,7 +39,6 @@ export default [
       file: "build/inject.js",
       format: "cjs",
       plugins: [terser()],
-      format: "iife",
     },
   },
   {
@@ -48,9 +46,9 @@ export default [
     output: {
       file: "build/options.js",
       format: "cjs",
-      format: "iife",
     },
     plugins: [
+      // eslint-disable-next-line no-undef
       process.env.NODE_ENV === "production" && terser(),
       resolve(),
       babel({
@@ -59,10 +57,16 @@ export default [
         presets: ["@babel/env", "@babel/preset-react"],
         extensions: [".js"],
       }),
-      commonjs(),
+      commonjs({
+        include: ["node_modules/**"],
+      }),
+      json(),
       replace({
+        preventAssignment: true,
+        // eslint-disable-next-line no-undef
         "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
       }),
+      webWorkerLoader(),
       postcss({
         plugins: [autoprefixer()],
       }),

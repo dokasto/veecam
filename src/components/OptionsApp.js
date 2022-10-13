@@ -3,10 +3,11 @@ import { createUseStyles } from "react-jss";
 import VideoSource from "./VideoSource";
 import SelfView from "./SelfView";
 import DisplayControls from "./DisplayControls";
+import { useFetchMediaStream } from "../hooks/mediaStreamHooks";
+import useFetchMediaDeviceList from "../hooks/useFetchMediaDeviceList";
 
 const useStyles = createUseStyles({
   root: {
-    border: "2px solid blue",
     backgroundColor: "#FFF",
     border: "2px solid #7f8c8d",
     padding: 8,
@@ -31,6 +32,8 @@ const useStyles = createUseStyles({
 
 export default function OptionsApp() {
   const classes = useStyles();
+  useFetchMediaStream();
+  useFetchMediaDeviceList();
   return (
     <div className={classes.root}>
       <h3 className={classes.preferences}>Preferences</h3>

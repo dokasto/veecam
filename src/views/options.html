@@ -19,5 +19,40 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Fragment shader program -->
+    <script id="shader-fs" type="x-shader/x-fragment">
+
+      //<!-- //## code for pixel effects goes here if needed -->
+
+      //# these two vars will access
+      varying mediump vec2 vDirection;
+      uniform sampler2D uSampler;
+
+      void main(void)
+      {
+          //# get current video pixel's color (no FOR-loops needed like in JS Canvas)
+          gl_FragColor = texture2D(uSampler, vec2(vDirection.x * 0.5 + 0.5, vDirection.y * 0.5 + 0.5));
+
+          /*
+          //# example of basic colour effect
+          gl_FragColor.r = ( gl_FragColor.r * 1.15 );
+          gl_FragColor.g = ( gl_FragColor.g * 0.8 );
+          gl_FragColor.b = ( gl_FragColor.b * 0.45 );
+          */
+      }
+    </script>
+
+    <!-- Vertex shader program -->
+    <script id="shader-vs" type="x-shader/x-vertex">
+
+      attribute mediump vec2 aVertexPosition;
+      varying mediump vec2 vDirection;
+
+      void main( void )
+      {
+          gl_Position = vec4(aVertexPosition, 1.0, 1.0) * 2.0;
+          vDirection = aVertexPosition;
+      }
+    </script>
   </body>
 </html>

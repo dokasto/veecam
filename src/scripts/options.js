@@ -2,6 +2,9 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { createUseStyles } from "react-jss";
 import OptionsApp from "../components/OptionsApp";
+import MediaStreamProvider from "../data_providers/MediaStreamProvider";
+import MediaDevicesProvider from "../data_providers/MediaDevicesProvider";
+import ErrorLogProvider from "../data_providers/ErrorLogProvider";
 
 const useStyles = createUseStyles({
   "@global": {
@@ -42,7 +45,7 @@ const useStyles = createUseStyles({
     fontSize: 28,
   },
   app: {
-    maxWidth: 1200,
+    width: 1200,
     margin: "0 auto",
     display: "flex",
   },
@@ -59,7 +62,13 @@ function Root() {
     <div className={classes.app}>
       <h2 className={classes.title}>VeeCam</h2>
       <div className={classes.optionsApp}>
-        <OptionsApp />
+        <ErrorLogProvider>
+          <MediaDevicesProvider>
+            <MediaStreamProvider>
+              <OptionsApp />
+            </MediaStreamProvider>
+          </MediaDevicesProvider>
+        </ErrorLogProvider>
       </div>
     </div>
   );
