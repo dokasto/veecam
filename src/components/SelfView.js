@@ -6,7 +6,6 @@ const useStyles = createUseStyles({
   root: {
     marginTop: 20,
     borderRadius: 4,
-    width: 680,
     textAlign: "center",
     overflow: "hidden",
   },
@@ -18,7 +17,7 @@ export default function SelfView() {
   useRenderStreamToCanvas(canvasRef.current);
 
   return (
-    <div className={classes.root}>
+    <div id="canvas-container" className={classes.root}>
       <canvas ref={canvasRef} id="canvas"></canvas>
     </div>
   );

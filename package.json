@@ -20,14 +20,12 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "gl-mat4": "^1.2.0",
     "prettier": "^2.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-jss": "^10.9.2",
     "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-web-worker-loader": "^1.6.1",
-    "uninstall": "^0.0.0",
-    "webgl-video-renderer": "^0.2.0"
+    "rollup-plugin-terser": "^7.0.2"
   }
 }

@@ -4,12 +4,12 @@ import React from "react";
 const useStyles = createUseStyles({
   root: {
     padding: "0 20px",
-    marginTop: 28,
+    marginTop: 48,
   },
   control: {
     display: "block",
-    padding: 12,
-    marginBottom: 16,
+    padding: 4,
+    marginBottom: 28,
     "& label": {
       textTransform: "uppercase",
       display: "block",

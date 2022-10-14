@@ -25,16 +25,17 @@ const useStyles = createUseStyles({
     "input[type=range]::-webkit-slider-runnable-track": {
       backgroundColor: "#ecf0f1",
       borderRadius: 8,
-      width: 4,
       cursor: "pointer",
+      height: 6,
     },
     "input[type=range]::-webkit-slider-thumb": {
       background: "#2c3e50",
       appearance: "none",
       cursor: "pointer",
-      borderRadius: 8,
-      width: 20,
+      borderRadius: 2,
+      width: 14,
       height: 20,
+      marginTop: -6,
     },
   },
   title: {
@@ -45,7 +46,7 @@ const useStyles = createUseStyles({
     fontSize: 28,
   },
   app: {
-    width: 1200,
+    width: 1080,
     margin: "0 auto",
     display: "flex",
   },

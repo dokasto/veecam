@@ -6,7 +6,6 @@ import replace from "@rollup/plugin-replace";
 import postcss from "rollup-plugin-postcss";
 import autoprefixer from "autoprefixer";
 import json from "@rollup/plugin-json";
-import webWorkerLoader from "rollup-plugin-web-worker-loader";
 
 export default [
   {
@@ -66,7 +65,6 @@ export default [
         // eslint-disable-next-line no-undef
         "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
       }),
-      webWorkerLoader(),
       postcss({
         plugins: [autoprefixer()],
       }),

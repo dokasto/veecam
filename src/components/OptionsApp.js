@@ -12,7 +12,6 @@ const useStyles = createUseStyles({
     border: "2px solid #7f8c8d",
     padding: 8,
     borderRadius: 8,
-    paddingLeft: 24,
   },
   preferences: {
     fontSize: 24,
@@ -23,7 +22,7 @@ const useStyles = createUseStyles({
     marginTop: 24,
   },
   camera: {
-    width: 700,
+    width: 640,
   },
   controls: {
     flex: 1,

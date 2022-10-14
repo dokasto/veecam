@@ -19,39 +19,43 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Fragment shader program -->
-    <script id="shader-fs" type="x-shader/x-fragment">
+    <script id="vertex-shader-2d" type="x-shader/x-vertex">
+      attribute vec2 a_position;
+      attribute vec2 a_texCoord;
 
-      //<!-- //## code for pixel effects goes here if needed -->
+      uniform vec2 u_resolution;
 
-      //# these two vars will access
-      varying mediump vec2 vDirection;
-      uniform sampler2D uSampler;
+      varying vec2 v_texCoord;
 
-      void main(void)
-      {
-          //# get current video pixel's color (no FOR-loops needed like in JS Canvas)
-          gl_FragColor = texture2D(uSampler, vec2(vDirection.x * 0.5 + 0.5, vDirection.y * 0.5 + 0.5));
+      void main() {
+         // convert the rectangle from pixels to 0.0 to 1.0
+         vec2 zeroToOne = a_position / u_resolution;
 
-          /*
-          //# example of basic colour effect
-          gl_FragColor.r = ( gl_FragColor.r * 1.15 );
-          gl_FragColor.g = ( gl_FragColor.g * 0.8 );
-          gl_FragColor.b = ( gl_FragColor.b * 0.45 );
-          */
+         // convert from 0->1 to 0->2
+         vec2 zeroToTwo = zeroToOne * 2.0;
+
+         // convert from 0->2 to -1->+1 (clipspace)
+         vec2 clipSpace = zeroToTwo - 1.0;
+
+         gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+
+         // pass the texCoord to the fragment shader
+         // The GPU will interpolate this value between points.
+         v_texCoord = a_texCoord;
       }
     </script>
+    <!-- fragment shader -->
+    <script id="fragment-shader-2d" type="x-shader/x-fragment">
+      precision mediump float;
 
-    <!-- Vertex shader program -->
-    <script id="shader-vs" type="x-shader/x-vertex">
+      // our texture
+      uniform sampler2D u_image;
 
-      attribute mediump vec2 aVertexPosition;
-      varying mediump vec2 vDirection;
+      // the texCoords passed in from the vertex shader.
+      varying vec2 v_texCoord;
 
-      void main( void )
-      {
-          gl_Position = vec4(aVertexPosition, 1.0, 1.0) * 2.0;
-          vDirection = aVertexPosition;
+      void main() {
+         gl_FragColor = texture2D(u_image, v_texCoord);
       }
     </script>
   </body>
