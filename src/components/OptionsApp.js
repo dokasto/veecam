@@ -2,7 +2,7 @@ import React from "react";
 import { createUseStyles } from "react-jss";
 import VideoSource from "./VideoSource";
 import SelfView from "./SelfView";
-import DisplayControls from "./DisplayControls";
+import ColorControls from "../components/ColorControls";
 import { useFetchMediaStream } from "../hooks/mediaStreamHooks";
 import useFetchMediaDeviceList from "../hooks/useFetchMediaDeviceList";
 
@@ -42,7 +42,7 @@ export default function OptionsApp() {
           <SelfView />
         </div>
         <div className={classes.controls}>
-          <DisplayControls />
+          <ColorControls />
         </div>
       </div>
       <div>filters</div>

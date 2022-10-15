@@ -31,13 +31,13 @@ export default function MediaDevicesProvider({ children }) {
     [audio, devices, setAudio, setDevices, setVideo, video]
   );
 
-  MediaDevicesProvider.propTypes = {
-    children: PropTypes.node,
-  };
-
   return (
     <MediaDevicesContext.Provider value={value}>
       {children}
     </MediaDevicesContext.Provider>
   );
 }
+
+MediaDevicesProvider.propTypes = {
+  children: PropTypes.node,
+};

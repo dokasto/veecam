@@ -5,6 +5,7 @@ import OptionsApp from "../components/OptionsApp";
 import MediaStreamProvider from "../data_providers/MediaStreamProvider";
 import MediaDevicesProvider from "../data_providers/MediaDevicesProvider";
 import ErrorLogProvider from "../data_providers/ErrorLogProvider";
+import ColorCorrectionProvider from "../data_providers/ColorCorrectionProvider";
 
 const useStyles = createUseStyles({
   "@global": {
@@ -65,9 +66,11 @@ function Root() {
       <div className={classes.optionsApp}>
         <ErrorLogProvider>
           <MediaDevicesProvider>
-            <MediaStreamProvider>
-              <OptionsApp />
-            </MediaStreamProvider>
+            <ColorCorrectionProvider>
+              <MediaStreamProvider>
+                <OptionsApp />
+              </MediaStreamProvider>
+            </ColorCorrectionProvider>
           </MediaDevicesProvider>
         </ErrorLogProvider>
       </div>

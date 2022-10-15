@@ -1,21 +1,12 @@
-export default function render(canvas, video) {
-  // Get A WebGL context
-  const gl = canvas.getContext("webgl");
-  if (!gl) {
-    console.error("WebGL not supported");
-    return;
-  }
+import filterFragmentShader from "../shaders/filter.fs";
+import defaultVertexShader from "../shaders/default.vs";
 
-  const vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
-  const fragmentShaderSource = document.querySelector(
-    "#fragment-shader-2d"
-  ).text;
-
-  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+export default function render(gl, video) {
+  const vertexShader = createShader(gl, gl.VERTEX_SHADER, defaultVertexShader);
   const fragmentShader = createShader(
     gl,
     gl.FRAGMENT_SHADER,
-    fragmentShaderSource
+    filterFragmentShader
   );
 
   const program = createProgram(gl, vertexShader, fragmentShader);
@@ -47,25 +38,35 @@ export default function render(canvas, video) {
   // Create a texture.
   const texture = initTexture(gl);
 
-  function render() {
+  function render(colorCorrectionParams) {
     updateTexture(gl, texture, video);
+
     // lookup uniforms
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
 
-    //   // Tell WebGL how to convert from clip space to pixels
+    // set the color correction uniform params
+    const uniformParams = [];
+    for (const param in colorCorrectionParams) {
+      uniformParams.push([
+        gl.getUniformLocation(program, "u_" + param),
+        parseFloat(colorCorrectionParams[param]).toFixed(1),
+      ]);
+    }
+
+    // Tell WebGL how to convert from clip space to pixels
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-    //   // Clear the canvas
+    // Clear the canvas
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    //   // Tell it to use our program (pair of shaders)
+    // Tell it to use our program (pair of shaders)
     gl.useProgram(program);
 
-    //   // Turn on the position attribute
+    // Turn on the position attribute
     gl.enableVertexAttribArray(positionLocation);
 
-    //   // Bind the position buffer.
+    // Bind the position buffer.
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
     // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
@@ -100,6 +101,11 @@ export default function render(canvas, video) {
 
     // set the resolution
     gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+
+    // set the params
+    for (const param of uniformParams) {
+      gl.uniform1f(...param);
+    }
 
     // Draw the rectangle.
     gl.drawArrays(gl.TRIANGLES, offset, 6);

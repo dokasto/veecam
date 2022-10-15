@@ -6,6 +6,7 @@ import replace from "@rollup/plugin-replace";
 import postcss from "rollup-plugin-postcss";
 import autoprefixer from "autoprefixer";
 import json from "@rollup/plugin-json";
+import glslify from "rollup-plugin-glslify";
 
 export default [
   {
@@ -60,6 +61,7 @@ export default [
         include: ["node_modules/**"],
       }),
       json(),
+      glslify(),
       replace({
         preventAssignment: true,
         // eslint-disable-next-line no-undef
