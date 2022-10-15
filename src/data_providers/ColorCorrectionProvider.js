@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 
 export default function ColorCorrectionProvider({ children }) {
   const [blur, setBlur] = useState(0);
-  const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(0);
   const [brightness, setBrightness] = useState(0);
   const [contrast, setContrast] = useState(0);
@@ -12,19 +11,17 @@ export default function ColorCorrectionProvider({ children }) {
   const value = useMemo(
     () => ({
       blur,
-      hue,
       saturation,
       brightness,
       contrast,
       exposure,
       setBlur,
-      setHue,
       setSaturation,
       setBrightness,
       setContrast,
       setExposure,
     }),
-    [blur, brightness, contrast, exposure, hue, saturation]
+    [blur, brightness, contrast, exposure, saturation]
   );
 
   return (

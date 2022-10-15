@@ -1,6 +1,7 @@
 import { createUseStyles } from "react-jss";
-import React, { useCallback, useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import ColorCorrectionContext from "../data_providers/ColorCorrectionContext";
+import useDebounce from "../hooks/useDebounce";
 
 const useStyles = createUseStyles({
   root: {
@@ -24,26 +25,57 @@ const useStyles = createUseStyles({
   },
 });
 
+const DELAY_MS = 200;
+
 export default function ColorControls() {
   const classes = useStyles();
   const {
     blur,
-    hue,
     saturation,
     brightness,
     contrast,
     exposure,
     setBlur,
-    setHue,
     setSaturation,
     setBrightness,
     setContrast,
     setExposure,
   } = useContext(ColorCorrectionContext);
-  const normalize = useCallback((value) => {
-    return value;
-  }, []);
-  const min = 0.0;
+
+  // const onBlurChange = (e) => {
+  //   console.log(e.target.value);
+  //   setBlur(e.target.value);
+  // }, DELAY_MS);
+
+  const onBlurChange = useMemo(
+    () =>
+      debounce((e) => {
+        console.log(e.target.value);
+        setBlur(e.target.value);
+      }, DELAY_MS),
+    [setBlur]
+  );
+
+  const onExposureChange = useDebounce((e) => {
+    setExposure(e.target.value);
+  }, DELAY_MS);
+
+  const onContrastChange = useDebounce((e) => {
+    console.log(e.target.value);
+    setContrast(e.target.value);
+  }, DELAY_MS);
+
+  const onBrightnessChange = useDebounce((e) => {
+    console.log(e.target.value);
+    setBrightness(e.target.value);
+  }, DELAY_MS);
+
+  const onSaturationChange = useDebounce((e) => {
+    console.log(e.target.value);
+    setSaturation(e.target.value);
+  }, DELAY_MS);
+
+  const min = -1.0;
   const max = 1.0;
   const step = 0.01;
   return (
@@ -57,55 +89,7 @@ export default function ColorControls() {
           value={blur}
           id="blur"
           type="range"
-          onChange={(e) => setBlur(normalize(e.target.value))}
-        />
-      </div>
-      <div className={classes.control}>
-        <label htmlFor="hue">Hue</label>
-        <input
-          step={step}
-          min={min}
-          max={max}
-          value={hue}
-          id="hue"
-          type="range"
-          onChange={(e) => setHue(normalize(e.target.value))}
-        />
-      </div>
-      <div className={classes.control}>
-        <label htmlFor="saturation">saturation</label>
-        <input
-          step={step}
-          min={min}
-          max={max}
-          value={saturation}
-          id="saturation"
-          type="range"
-          onChange={(e) => setSaturation(normalize(e.target.value))}
-        />
-      </div>
-      <div className={classes.control}>
-        <label htmlFor="brightness">brightness</label>
-        <input
-          step={step}
-          min={min}
-          max={max}
-          value={brightness}
-          id="brightness"
-          type="range"
-          onChange={(e) => setBrightness(normalize(e.target.value))}
-        />
-      </div>
-      <div className={classes.control}>
-        <label htmlFor="contrast">contrast</label>
-        <input
-          step={step}
-          min={min}
-          max={max}
-          value={contrast}
-          id="contrast"
-          type="range"
-          onChange={(e) => setContrast(normalize(e.target.value))}
+          onChange={onBlurChange}
         />
       </div>
       <div className={classes.control}>
@@ -117,9 +101,55 @@ export default function ColorControls() {
           value={exposure}
           id="exposure"
           type="range"
-          onChange={(e) => setExposure(normalize(e.target.value))}
+          onChange={onExposureChange}
+        />
+      </div>
+      <div className={classes.control}>
+        <label htmlFor="contrast">contrast</label>
+        <input
+          step={step}
+          min={min}
+          max={max}
+          value={contrast}
+          id="contrast"
+          type="range"
+          onChange={onContrastChange}
+        />
+      </div>
+      <div className={classes.control}>
+        <label htmlFor="saturation">saturation</label>
+        <input
+          step={step}
+          min={min}
+          max={max}
+          value={saturation}
+          id="saturation"
+          type="range"
+          onChange={onSaturationChange}
+        />
+      </div>
+      <div className={classes.control}>
+        <label htmlFor="brightness">brightness</label>
+        <input
+          step={step}
+          min={min}
+          max={max}
+          value={brightness}
+          id="brightness"
+          type="range"
+          onChange={onBrightnessChange}
         />
       </div>
     </div>
   );
+}
+
+function debounce(fn, delay) {
+  let timeout;
+  return function (...args) {
+    window.clearTimeout(timeout);
+    timeout = window.setTimeout(() => {
+      fn(...args);
+    }, delay);
+  };
 }

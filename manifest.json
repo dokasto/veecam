@@ -7,7 +7,7 @@
   "background": {
     "service_worker": "build/background.js"
   },
-  "permissions": ["scripting"],
+  "permissions": ["scripting", "storage"],
   "action": {
     "default_popup": "src/views/popup.html"
   },

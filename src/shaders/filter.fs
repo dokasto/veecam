@@ -5,36 +5,36 @@ uniform sampler2D u_video_frame;
 // the texCoords passed in from the vertex shader.
 varying vec2 v_texCoord;
 
-uniform float u_hue;
+uniform float u_exposure;
+uniform float u_contrast;
 uniform float u_saturation;
 uniform float u_brightness;
-uniform float u_contrast;
-uniform float u_exposure;
 
-vec3 rgb2hsv(vec3 c) {
-  vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-  vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-  vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-  float d = q.x - min(q.w, q.y);
-  float e = 1.0e-10;
-  return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+
+vec3 adjustExposure(vec3 color, float value) { return (1.0 + value) * color; }
+
+vec3 adjustContrast(vec3 color, float value) {
+  return 0.5 + (1.0 + value) * (color - 0.5);
 }
 
-vec3 hsv2rgb(vec3 c) {
-  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+// https://www.w3.org/TR/WCAG21/#dfn-relative-luminance
+vec3 adjustSaturation(vec3 color, float value) {
+  const vec3 luminosityFactor = vec3(0.2126, 0.7152, 0.0722);
+  vec3 grayscale = vec3(dot(color, luminosityFactor));
+  return mix(grayscale, color, 1.0 + value);
 }
+
+vec3 adjustBrightness(vec3 color, float value) { return color + value; }
 
 void main() {
   vec4 pixel = texture2D(u_video_frame, v_texCoord);
-  vec3 hsv = rgb2hsv(pixel.rgb);
+  vec3 color = pixel.rgb;
 
-  float h = hsv.x + u_hue;
-  float s = hsv.y + u_saturation;
-  float v = hsv.z + u_brightness;
+  color = clamp(adjustExposure(color, u_exposure), 0.0, 1.0);
+  color = clamp(adjustContrast(color, u_contrast), 0.0, 1.0);
+  color = clamp(adjustSaturation(color, u_saturation), 0.0, 1.0);
+  color = clamp(adjustBrightness(color, u_brightness), 0.0, 1.0);
 
-  vec3 proccessed_pixel = hsv2rgb(vec3(h, s, v));
-
-  gl_FragColor = vec4(proccessed_pixel, 1.0);
+  gl_FragColor = vec4(color, 1.0);
 }
