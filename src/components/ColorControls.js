@@ -1,7 +1,6 @@
 import { createUseStyles } from "react-jss";
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useCallback } from "react";
 import ColorCorrectionContext from "../data_providers/ColorCorrectionContext";
-import useDebounce from "../hooks/useDebounce";
 
 const useStyles = createUseStyles({
   root: {
@@ -25,7 +24,9 @@ const useStyles = createUseStyles({
   },
 });
 
-const DELAY_MS = 200;
+const MIN = -1.0;
+const MAX = 1.0;
+const STEP = 0.01;
 
 export default function ColorControls() {
   const classes = useStyles();
@@ -42,51 +43,44 @@ export default function ColorControls() {
     setExposure,
   } = useContext(ColorCorrectionContext);
 
-  // const onBlurChange = (e) => {
-  //   console.log(e.target.value);
-  //   setBlur(e.target.value);
-  // }, DELAY_MS);
+  const onBlurChange = (e) => {
+    setBlur(e.target.value);
+  };
 
-  const onBlurChange = useMemo(
-    () =>
-      debounce((e) => {
-        console.log(e.target.value);
-        setBlur(e.target.value);
-      }, DELAY_MS),
-    [setBlur]
-  );
-
-  const onExposureChange = useDebounce((e) => {
+  const onExposureChange = (e) => {
     setExposure(e.target.value);
-  }, DELAY_MS);
+  };
 
-  const onContrastChange = useDebounce((e) => {
-    console.log(e.target.value);
+  const onContrastChange = (e) => {
     setContrast(e.target.value);
-  }, DELAY_MS);
+  };
 
-  const onBrightnessChange = useDebounce((e) => {
-    console.log(e.target.value);
+  const onBrightnessChange = (e) => {
     setBrightness(e.target.value);
-  }, DELAY_MS);
+  };
 
-  const onSaturationChange = useDebounce((e) => {
-    console.log(e.target.value);
+  const onSaturationChange = (e) => {
     setSaturation(e.target.value);
-  }, DELAY_MS);
+  };
 
-  const min = -1.0;
-  const max = 1.0;
-  const step = 0.01;
+  const onReset = useCallback(() => {
+    setBlur(0);
+    setBrightness(0);
+    setContrast(0);
+    setExposure(0);
+    setBlur(0);
+    setSaturation(0);
+  }, [setBlur, setBrightness, setContrast, setExposure, setSaturation]);
+
   return (
     <div className={classes.root}>
       <div className={classes.control}>
         <label htmlFor="blur">Background Blur</label>
         <input
-          step={step}
-          min={min}
-          max={max}
           value={blur}
+          step={STEP}
+          min={MIN}
+          max={MAX}
           id="blur"
           type="range"
           onChange={onBlurChange}
@@ -95,21 +89,21 @@ export default function ColorControls() {
       <div className={classes.control}>
         <label htmlFor="exposure">exposure</label>
         <input
-          step={step}
-          min={min}
-          max={max}
+          step={STEP}
+          min={MIN}
+          max={MAX}
           value={exposure}
           id="exposure"
           type="range"
-          onChange={onExposureChange}
+          onInput={onExposureChange}
         />
       </div>
       <div className={classes.control}>
         <label htmlFor="contrast">contrast</label>
         <input
-          step={step}
-          min={min}
-          max={max}
+          step={STEP}
+          min={MIN}
+          max={MAX}
           value={contrast}
           id="contrast"
           type="range"
@@ -119,9 +113,9 @@ export default function ColorControls() {
       <div className={classes.control}>
         <label htmlFor="saturation">saturation</label>
         <input
-          step={step}
-          min={min}
-          max={max}
+          step={STEP}
+          min={MIN}
+          max={MAX}
           value={saturation}
           id="saturation"
           type="range"
@@ -131,25 +125,16 @@ export default function ColorControls() {
       <div className={classes.control}>
         <label htmlFor="brightness">brightness</label>
         <input
-          step={step}
-          min={min}
-          max={max}
+          step={STEP}
+          min={MIN}
+          max={MAX}
           value={brightness}
           id="brightness"
           type="range"
           onChange={onBrightnessChange}
         />
       </div>
+      <button onClick={onReset}>Reset</button>
     </div>
   );
-}
-
-function debounce(fn, delay) {
-  let timeout;
-  return function (...args) {
-    window.clearTimeout(timeout);
-    timeout = window.setTimeout(() => {
-      fn(...args);
-    }, delay);
-  };
 }
