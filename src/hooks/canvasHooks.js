@@ -23,7 +23,7 @@ export function useRenderStreamToCanvas(canvas) {
       return;
     }
     const segmenterConfig = {
-      runtime: "tfjs", // or 'mediapipe'
+      runtime: "mediapipe", // or 'mediapipe'
       modelType: "general",
     };
 
@@ -45,9 +45,11 @@ export function useRenderStreamToCanvas(canvas) {
       videoRef.current.width = videoRef.current.videoWidth;
       videoRef.current.height = videoRef.current.videoHeight;
       renderer.current = renderVideoToCanvas(glRef.current, videoRef.current);
+      console.log("start segmentation");
       segmenterRef.current
         .segmentPeople(videoRef.current)
         .then((segmentation) => {
+          console.log("stop segmentation");
           segmentationRef.current = segmentation;
         });
     }
@@ -71,19 +73,25 @@ export function useRenderStreamToCanvas(canvas) {
         videoRef.current.videoWidth > 0 &&
         videoRef.current.videoHeight > 0
       ) {
-        renderer.current?.render(videoRef.current, {
-          hue,
-          saturation,
-          brightness,
-          contrast,
-          exposure,
-        });
-
-        if (segmenterRef.current != null) {
-          const [people] = segmenterRef.current;
-          console.log(people);
+        if (segmentationRef.current != null) {
+          const [people] = segmentationRef.current;
+          const segmentedImageData = await people.mask.toImageData();
+          renderer.current?.render(segmentedImageData, {
+            hue,
+            saturation,
+            brightness,
+            contrast,
+            exposure,
+          });
+        } else {
+          renderer.current?.render(videoRef.current, {
+            hue,
+            saturation,
+            brightness,
+            contrast,
+            exposure,
+          });
         }
-        // const segmentedImageData = await people.mask.toImageData();
       }
 
       requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
