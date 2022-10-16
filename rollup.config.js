@@ -1,5 +1,4 @@
 import { terser } from "rollup-plugin-terser";
-import resolve from "@rollup/plugin-node-resolve";
 import { babel } from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
@@ -7,6 +6,7 @@ import postcss from "rollup-plugin-postcss";
 import autoprefixer from "autoprefixer";
 import json from "@rollup/plugin-json";
 import glslify from "rollup-plugin-glslify";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 
 export default [
   {
@@ -50,15 +50,19 @@ export default [
     plugins: [
       // eslint-disable-next-line no-undef
       process.env.NODE_ENV === "production" && terser(),
-      resolve(),
       babel({
         exclude: "node_modules/**",
         babelHelpers: "bundled",
         presets: ["@babel/env", "@babel/preset-react"],
         extensions: [".js"],
       }),
+      nodeResolve({
+        browser: true,
+        modulePaths: ["node_modules/@tensorflow/**"],
+      }),
       commonjs({
         include: ["node_modules/**"],
+        requireReturnsDefault: true,
       }),
       json(),
       glslify(),

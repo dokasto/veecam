@@ -8,6 +8,10 @@ const useStyles = createUseStyles({
     borderRadius: 4,
     textAlign: "center",
     overflow: "hidden",
+    minWidth: 640,
+    minHeight: 480,
+    backgroundColor: "transparent",
+    padding: 0,
   },
 });
 

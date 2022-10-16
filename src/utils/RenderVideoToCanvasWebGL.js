@@ -38,8 +38,8 @@ export default function render(gl, video) {
   // Create a texture.
   const texture = initTexture(gl);
 
-  function render(colorCorrectionParams) {
-    updateTexture(gl, texture, video);
+  function render(imageData, colorCorrectionParams) {
+    updateTexture(gl, texture, imageData);
 
     // lookup uniforms
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
@@ -128,7 +128,7 @@ function setRectangle(gl, x, y, width, height) {
   );
 }
 
-function updateTexture(gl, texture, video) {
+function updateTexture(gl, texture, imageData) {
   const level = 0;
   const internalFormat = gl.RGBA;
   const srcFormat = gl.RGBA;
@@ -141,7 +141,7 @@ function updateTexture(gl, texture, video) {
     internalFormat,
     srcFormat,
     srcType,
-    video
+    imageData
   );
 }
 
