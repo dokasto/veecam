@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { createUseStyles } from "react-jss";
-import { useRenderStreamToCanvas } from "../hooks/canvasHooks";
+import useRenderStreamToCanvas from "../hooks/useRenderStreamToCanvas";
 
 const useStyles = createUseStyles({
   root: {
