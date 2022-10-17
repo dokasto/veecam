@@ -53,9 +53,9 @@ export default function ColorCorrectionProvider({ children }) {
           "failed to load color correction data from store",
           e
         );
+      } finally {
+        hasSetInitialStateFromStore.current = true;
       }
-
-      hasSetInitialStateFromStore.current = true;
     });
   }, [logError]);
 

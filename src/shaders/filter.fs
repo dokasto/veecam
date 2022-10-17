@@ -1,7 +1,8 @@
 precision mediump float;
 
-// our texture
 uniform sampler2D u_video_frame;
+uniform sampler2D u_segmented_video_frame;
+
 // the texCoords passed in from the vertex shader.
 varying vec2 v_texCoord;
 
@@ -28,13 +29,18 @@ vec3 adjustSaturation(vec3 color, float value) {
 vec3 adjustBrightness(vec3 color, float value) { return color + value; }
 
 void main() {
-  vec4 pixel = texture2D(u_video_frame, v_texCoord);
-  vec3 color = pixel.rgb;
+  vec4 video_pixel = texture2D(u_video_frame, v_texCoord);
+  vec4 segmented_video_pixel = texture2D(u_segmented_video_frame, v_texCoord);
 
-  color = clamp(adjustExposure(color, u_exposure), 0.0, 1.0);
-  color = clamp(adjustContrast(color, u_contrast), 0.0, 1.0);
-  color = clamp(adjustSaturation(color, u_saturation), 0.0, 1.0);
-  color = clamp(adjustBrightness(color, u_brightness), 0.0, 1.0);
+  vec3 color = segmented_video_pixel.rgb;
+
+  if (segmented_video_pixel.rgb.r != 0.0 && segmented_video_pixel.rgb.y == 0.0 && segmented_video_pixel.rgb.z == 0.0) {
+    color = video_pixel.rgb;
+    color = clamp(adjustExposure(color, u_exposure), 0.0, 1.0);
+    color = clamp(adjustContrast(color, u_contrast), 0.0, 1.0);
+    color = clamp(adjustSaturation(color, u_saturation), 0.0, 1.0);
+    color = clamp(adjustBrightness(color, u_brightness), 0.0, 1.0);
+  }
 
   gl_FragColor = vec4(color, 1.0);
 }

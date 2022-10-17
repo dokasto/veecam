@@ -35,7 +35,6 @@ export function useRenderStreamToCanvas(canvas) {
       .createSegmenter(model, segmenterConfig)
       .then((segmenter) => {
         segmenterRef.current = segmenter;
-        console.log("segmenter ", segmenter);
       });
   }, []);
 
@@ -74,7 +73,7 @@ export function useRenderStreamToCanvas(canvas) {
           );
           const [people] = segmentation;
           const segmentedImageData = await people.mask.toImageData();
-          renderer.current?.render(segmentedImageData, {
+          renderer.current?.render(videoRef.current, segmentedImageData, {
             hue,
             saturation,
             brightness,
@@ -82,15 +81,6 @@ export function useRenderStreamToCanvas(canvas) {
             exposure,
           });
         }
-        // else {
-        //   renderer.current?.render(videoRef.current, {
-        //     hue,
-        //     saturation,
-        //     brightness,
-        //     contrast,
-        //     exposure,
-        //   });
-        // }
       }
 
       requestAnimationFrameRef.current = window.requestAnimationFrame(loop);

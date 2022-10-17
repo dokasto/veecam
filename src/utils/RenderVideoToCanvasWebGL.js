@@ -36,13 +36,19 @@ export default function render(gl, video) {
   );
 
   // Create a texture.
-  const texture = initTexture(gl);
+  const videoTexture = initTexture(gl, gl.TEXTURE7);
+  const segmentedVideoTexture = initTexture(gl, gl.TEXTURE4);
 
-  function render(imageData, colorCorrectionParams) {
-    updateTexture(gl, texture, imageData);
+  function render(videoFrame, segementedImageData, colorCorrectionParams) {
+    updateTexture(gl, videoTexture, videoFrame);
+    updateTexture(gl, segmentedVideoTexture, segementedImageData);
 
-    // lookup uniforms
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+    const videoFrameLocaiton = gl.getUniformLocation(program, "u_video_frame");
+    const segmentedVideoFrameLocation = gl.getUniformLocation(
+      program,
+      "u_segmented_video_frame"
+    );
 
     // set the color correction uniform params
     const uniformParams = [];
@@ -101,6 +107,8 @@ export default function render(gl, video) {
 
     // set the resolution
     gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+    gl.uniform1i(videoFrameLocaiton, 7);
+    gl.uniform1i(segmentedVideoFrameLocation, 4);
 
     // set the params
     for (const param of uniformParams) {
@@ -128,7 +136,7 @@ function setRectangle(gl, x, y, width, height) {
   );
 }
 
-function updateTexture(gl, texture, imageData) {
+function updateTexture(gl, texture, videoFrame) {
   const level = 0;
   const internalFormat = gl.RGBA;
   const srcFormat = gl.RGBA;
@@ -141,12 +149,13 @@ function updateTexture(gl, texture, imageData) {
     internalFormat,
     srcFormat,
     srcType,
-    imageData
+    videoFrame
   );
 }
 
-function initTexture(gl) {
+function initTexture(gl, textureIndex) {
   const texture = gl.createTexture();
+  gl.activeTexture(textureIndex);
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
   // Because video has to be download over the internet
