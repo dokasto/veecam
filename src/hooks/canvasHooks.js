@@ -2,9 +2,13 @@ import { useRef, useContext, useEffect, useCallback } from "react";
 import ColorCorrectionContext from "../data_providers/ColorCorrectionContext";
 import MediaStreamContext from "../data_providers/MediaStreamContext";
 import renderVideoToCanvas from "../utils/RenderVideoToCanvasWebGL";
-import * as bodySegmentation from "@tensorflow-models/body-segmentation";
+
+/* Tensor flow */
 import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
+import * as bodySegmentation from "@tensorflow-models/body-segmentation";
+// import "@mediapipe/selfie_segmentation/selfie_segmentation";
+import "@tensorflow/tfjs-converter";
 
 export function useRenderStreamToCanvas(canvas) {
   const { stream } = useContext(MediaStreamContext);
@@ -16,24 +20,22 @@ export function useRenderStreamToCanvas(canvas) {
   const videoRef = useRef(null);
   const renderer = useRef(null);
   const segmenterRef = useRef(null);
-  const segmentationRef = useRef(null);
 
   useEffect(() => {
     if (segmenterRef.current != null) {
       return;
     }
+    const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
     const segmenterConfig = {
-      runtime: "mediapipe", // or 'mediapipe'
+      runtime: "tfjs", // mediapipe/tfjs
       modelType: "general",
     };
 
     bodySegmentation
-      .createSegmenter(
-        bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation,
-        segmenterConfig
-      )
+      .createSegmenter(model, segmenterConfig)
       .then((segmenter) => {
         segmenterRef.current = segmenter;
+        console.log("segmenter ", segmenter);
       });
   }, []);
 
@@ -45,13 +47,6 @@ export function useRenderStreamToCanvas(canvas) {
       videoRef.current.width = videoRef.current.videoWidth;
       videoRef.current.height = videoRef.current.videoHeight;
       renderer.current = renderVideoToCanvas(glRef.current, videoRef.current);
-      console.log("start segmentation");
-      segmenterRef.current
-        .segmentPeople(videoRef.current)
-        .then((segmentation) => {
-          console.log("stop segmentation");
-          segmentationRef.current = segmentation;
-        });
     }
   }, [canvas]);
 
@@ -73,8 +68,11 @@ export function useRenderStreamToCanvas(canvas) {
         videoRef.current.videoWidth > 0 &&
         videoRef.current.videoHeight > 0
       ) {
-        if (segmentationRef.current != null) {
-          const [people] = segmentationRef.current;
+        if (segmenterRef.current != null) {
+          const segmentation = await segmenterRef.current.segmentPeople(
+            videoRef.current
+          );
+          const [people] = segmentation;
           const segmentedImageData = await people.mask.toImageData();
           renderer.current?.render(segmentedImageData, {
             hue,
@@ -83,15 +81,16 @@ export function useRenderStreamToCanvas(canvas) {
             contrast,
             exposure,
           });
-        } else {
-          renderer.current?.render(videoRef.current, {
-            hue,
-            saturation,
-            brightness,
-            contrast,
-            exposure,
-          });
         }
+        // else {
+        //   renderer.current?.render(videoRef.current, {
+        //     hue,
+        //     saturation,
+        //     brightness,
+        //     contrast,
+        //     exposure,
+        //   });
+        // }
       }
 
       requestAnimationFrameRef.current = window.requestAnimationFrame(loop);

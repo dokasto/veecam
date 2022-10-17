@@ -1,11 +1,13 @@
 import React, { useRef, useEffect, useMemo, useState } from "react";
 import ColorCorrectionContext from "./ColorCorrectionContext";
 import PropTypes from "prop-types";
+import useErrorLogger from "../hooks/useErrorLogger";
 
 const KEY = "VEECAM:COLOR_CORRECTION_KEY";
 const SAVE_DELAY_MS = 300;
 
 export default function ColorCorrectionProvider({ children }) {
+  const logError = useErrorLogger();
   const [blur, setBlur] = useState(0);
   const [saturation, setSaturation] = useState(0);
   const [brightness, setBrightness] = useState(0);
@@ -36,16 +38,26 @@ export default function ColorCorrectionProvider({ children }) {
 
     // eslint-disable-next-line no-undef
     chrome.storage.sync.get(KEY, function (data) {
-      const pref = JSON.parse(data[KEY]);
-      pref?.blur != null && setBlur(pref.blur);
-      pref?.saturation != null && setSaturation(pref.saturation);
-      pref?.brightness != null && setBrightness(pref.brightness);
-      pref?.contrast != null && setContrast(pref.contrast);
-      pref?.exposure != null && setExposure(pref.exposure);
+      try {
+        if (data != null && KEY in data && data[KEY] != null) {
+          const pref = JSON.parse(data[KEY]);
+          pref?.blur != null && setBlur(pref.blur);
+          pref?.saturation != null && setSaturation(pref.saturation);
+          pref?.brightness != null && setBrightness(pref.brightness);
+          pref?.contrast != null && setContrast(pref.contrast);
+          pref?.exposure != null && setExposure(pref.exposure);
+        }
+      } catch (e) {
+        logError(
+          "ColorCorrectionProvider",
+          "failed to load color correction data from store",
+          e
+        );
+      }
 
       hasSetInitialStateFromStore.current = true;
     });
-  }, []);
+  }, [logError]);
 
   const lastTime = useRef(null);
 
