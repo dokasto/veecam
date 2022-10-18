@@ -1,199 +1,150 @@
 import filterFragmentShader from "../shaders/filter.fs";
 import defaultVertexShader from "../shaders/default.vs";
-import { useCallback, useRef } from "react";
+import { useRef, useCallback } from "react";
 
 export default function useRenderer() {
-  const gl = useRef(null);
-  const video = useRef(null);
-  const positionLocation = useRef(null);
-  const texcoordLocation = useRef(null);
-  const videoTexture = useRef(null);
-  const segmentedVideoTexture = useRef(null);
+  const glRef = useRef(null);
   const programRef = useRef(null);
-  const texcoordBuffer = useRef(null);
 
-  const init = useCallback((webGLContext, videoElementRef) => {
-    gl.current = webGLContext;
-    video.current = videoElementRef;
+  const init = useCallback((gl) => {
+    glRef.current = gl;
 
     const vertexShader = createShader(
-      gl.current,
-      gl.current.VERTEX_SHADER,
+      gl,
+      gl.VERTEX_SHADER,
       defaultVertexShader
     );
     const fragmentShader = createShader(
-      gl.current,
-      gl.current.FRAGMENT_SHADER,
+      gl,
+      gl.FRAGMENT_SHADER,
       filterFragmentShader
     );
 
-    programRef.current = createProgram(
-      gl.current,
-      vertexShader,
-      fragmentShader
-    );
+    programRef.current = createProgram(gl, vertexShader, fragmentShader);
+  }, []);
+
+  const render = useCallback((video, segmentedVideo, colorCorrectionParams) => {
+    const gl = glRef.current;
+    const program = programRef.current;
+
+    if (gl == null) {
+      console.error("GL not initialised");
+      return;
+    }
 
     // look up where the vertex data needs to go.
-    positionLocation.current = gl.current.getAttribLocation(
-      programRef.current,
-      "a_position"
-    );
-    texcoordLocation.current = gl.current.getAttribLocation(
-      programRef.current,
-      "a_texCoord"
-    );
+    const positionLocation = gl.getAttribLocation(program, "a_position");
+    const texcoordLocation = gl.getAttribLocation(program, "a_texCoord");
 
     // Create a buffer to put three 2d clip space points in
-    const positionBuffer = gl.current.createBuffer();
+    const positionBuffer = gl.createBuffer();
 
     // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-    gl.current.bindBuffer(gl.current.ARRAY_BUFFER, positionBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
     // Set a rectangle the same size as the image.
-    setRectangle(
-      gl.current,
-      0,
-      0,
-      video.current.videoWidth,
-      video.current.videoHeight
-    );
+    setRectangle(gl, 0, 0, video.videoWidth, video.videoHeight);
 
     // provide texture coordinates for the rectangle.
-    texcoordBuffer.current = gl.current.createBuffer();
-
-    gl.current.bindBuffer(gl.current.ARRAY_BUFFER, texcoordBuffer.current);
-    gl.current.bufferData(
-      gl.current.ARRAY_BUFFER,
+    const texcoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
       new Float32Array([
         0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0,
       ]),
-      gl.current.STATIC_DRAW
+      gl.STATIC_DRAW
     );
 
     // Create a texture.
-    videoTexture.current = initTexture(gl.current, gl.current.TEXTURE7);
-    segmentedVideoTexture.current = initTexture(
-      gl.current,
-      gl.current.TEXTURE4
+    const videoTexture = initTexture(gl, gl.TEXTURE7);
+    const segmentedVideoTexture = initTexture(gl, gl.TEXTURE4);
+
+    updateTexture(gl, videoTexture, video);
+    updateTexture(gl, segmentedVideoTexture, segmentedVideo);
+
+    const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+    const videoFrameLocation = gl.getUniformLocation(program, "u_video_frame");
+    const segmentedVideoFrameLocation = gl.getUniformLocation(
+      program,
+      "u_segmented_video_frame"
     );
+
+    // set the color correction uniform params
+    const uniformParams = [];
+    for (const param in colorCorrectionParams) {
+      uniformParams.push([
+        gl.getUniformLocation(program, "u_" + param),
+        parseFloat(colorCorrectionParams[param]).toFixed(1),
+      ]);
+    }
+
+    // Tell WebGL how to convert from clip space to pixels
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    // Clear the canvas
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // Tell it to use our program (pair of shaders)
+    gl.useProgram(program);
+
+    // Turn on the position attribute
+    gl.enableVertexAttribArray(positionLocation);
+
+    // Bind the position buffer.
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+    // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+    const size = 2; // 2 components per iteration
+    const type = gl.FLOAT; // the data is 32bit floats
+    const normalize = false; // don't normalize the data
+    const stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+    const offset = 0; // start at the beginning of the buffer
+    gl.vertexAttribPointer(
+      positionLocation,
+      size,
+      type,
+      normalize,
+      stride,
+      offset
+    );
+
+    // Turn on the texcoord attribute
+    gl.enableVertexAttribArray(texcoordLocation);
+
+    // bind the texcoord buffer.
+    gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+
+    gl.vertexAttribPointer(
+      texcoordLocation,
+      size,
+      type,
+      normalize,
+      stride,
+      offset
+    );
+
+    // set the resolution
+    gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+    gl.uniform1i(videoFrameLocation, 7);
+    gl.uniform1i(segmentedVideoFrameLocation, 4);
+
+    // set the params
+    for (const param of uniformParams) {
+      gl.uniform1f(...param);
+    }
+
+    // Draw the rectangle.
+    gl.drawArrays(gl.TRIANGLES, offset, 6);
   }, []);
-
-  const render = useCallback(
-    (videoFrame, segementedImageData, colorCorrectionParams) => {
-      updateTexture(gl.current, videoTexture.current, videoFrame);
-      updateTexture(
-        gl.current,
-        segmentedVideoTexture.current,
-        segementedImageData
-      );
-
-      const resolutionLocation = gl.current.getUniformLocation(
-        programRef.current,
-        "u_resolution"
-      );
-      const videoFrameLocation = gl.current.getUniformLocation(
-        programRef.current,
-        "u_video_frame"
-      );
-      const segmentedVideoFrameLocation = gl.current.getUniformLocation(
-        programRef.current,
-        "u_segmented_video_frame"
-      );
-
-      // set the color correction uniform params
-      const uniformParams = [];
-      for (const param in colorCorrectionParams) {
-        uniformParams.push([
-          gl.current.getUniformLocation(programRef.current, "u_" + param),
-          parseFloat(colorCorrectionParams[param]).toFixed(1),
-        ]);
-      }
-
-      // Tell WebGL how to convert from clip space to pixels
-      gl.current.viewport(
-        0,
-        0,
-        gl.current.canvas.width,
-        gl.current.canvas.height
-      );
-
-      // Clear the canvas
-      gl.current.clearColor(0, 0, 0, 0);
-      gl.current.clear(
-        gl.current.COLOR_BUFFER_BIT | gl.current.DEPTH_BUFFER_BIT
-      );
-
-      // Tell it to use our program (pair of shaders)
-      gl.current.useProgram(programRef.current);
-
-      // Turn on the position attribute
-      gl.current.enableVertexAttribArray(positionLocation.current);
-
-      // Bind the position buffer.
-      gl.current.bindBuffer(gl.current.ARRAY_BUFFER, texcoordBuffer.current);
-
-      // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-      const size = 2; // 2 components per iteration
-      const type = gl.current.FLOAT; // the data is 32bit floats
-      const normalize = false; // don't normalize the data
-      const stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-      const offset = 0; // start at the beginning of the buffer
-      gl.current.vertexAttribPointer(
-        positionLocation.current,
-        size,
-        type,
-        normalize,
-        stride,
-        offset
-      );
-
-      // Turn on the texcoord attribute
-      gl.current.enableVertexAttribArray(texcoordLocation.current);
-
-      // bind the texcoord buffer.
-      gl.current.bindBuffer(gl.current.ARRAY_BUFFER, texcoordBuffer.current);
-
-      gl.current.vertexAttribPointer(
-        texcoordLocation.current,
-        size,
-        type,
-        normalize,
-        stride,
-        offset
-      );
-
-      // set the resolution
-      gl.current.uniform2f(
-        resolutionLocation.current,
-        gl.current.canvas.width,
-        gl.current.canvas.height
-      );
-      gl.current.uniform1i(videoFrameLocation, 7);
-      gl.current.uniform1i(segmentedVideoFrameLocation, 4);
-
-      // set the params
-      for (const param of uniformParams) {
-        gl.current.uniform1f(...param);
-      }
-
-      // Draw the rectangle.
-      gl.current.drawArrays(gl.current.TRIANGLES, offset, 6);
-    },
-    []
-  );
 
   const destroy = useCallback(() => {
-    gl.current = null;
-    video.current = null;
-    positionLocation.current = null;
-    texcoordLocation.current = null;
-    videoTexture.current = null;
-    segmentedVideoTexture.current = null;
+    glRef.current = null;
     programRef.current = null;
-    texcoordBuffer.current = null;
   }, []);
 
-  return { init, render, destroy };
+  return { render, init, destroy };
 }
 
 function setRectangle(gl, x, y, width, height) {
@@ -230,6 +181,10 @@ function initTexture(gl, textureIndex) {
   gl.activeTexture(textureIndex);
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
+  // Because video has to be download over the internet
+  // they might take a moment until it's ready so
+  // put a single pixel in the texture so we can
+  // use it immediately.
   const level = 0;
   const internalFormat = gl.RGBA;
   const width = 1;

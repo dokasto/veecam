@@ -34,13 +34,13 @@ void main() {
 
   vec3 color = segmented_video_pixel.rgb;
 
-  if (segmented_video_pixel.rgb.r != 0.0 && segmented_video_pixel.rgb.y == 0.0 && segmented_video_pixel.rgb.z == 0.0) {
+//  if (segmented_video_pixel.rgb.r != 0.0 && segmented_video_pixel.rgb.y == 0.0 && segmented_video_pixel.rgb.z == 0.0) {
     color = video_pixel.rgb;
     color = clamp(adjustExposure(color, u_exposure), 0.0, 1.0);
     color = clamp(adjustContrast(color, u_contrast), 0.0, 1.0);
     color = clamp(adjustSaturation(color, u_saturation), 0.0, 1.0);
     color = clamp(adjustBrightness(color, u_brightness), 0.0, 1.0);
-  }
+//  }
 
   gl_FragColor = vec4(color, 1.0);
 }
