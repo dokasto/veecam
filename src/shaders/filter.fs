@@ -51,19 +51,19 @@ void main() {
     color = clamp(adjustBrightness(color, u_brightness), 0.0, 1.0);
     gl_FragColor = vec4(color, 1.0);
  } else {
-    int _KernelSize = 10;
-    int upper = ((_KernelSize - 1) / 2);
-		int lower = -upper;
-    vec2 uv = vec2(gl_FragCoord.xy / u_resolution.xy);
+    // int _KernelSize = 10;
+    // int upper = ((_KernelSize - 1) / 2);
+		// int lower = -upper;
+    // vec2 uv = vec2(gl_FragCoord.xy / u_resolution.xy);
 
-    for (int x = lower; x <= upper; ++x) {
-      color += texture2D(u_video_frame, uv + fixed2(u_resolution.x * float(x), 0.0));
-      // color += texture2D(image, uv + (off1 / resolution)) * 0.35294117647058826;
-    }
+    // for (int x = lower; x <= upper; ++x) {
+    //   color += texture2D(u_video_frame, uv + fixed2(u_resolution.x * float(x), 0.0));
+    //   // color += texture2D(image, uv + (off1 / resolution)) * 0.35294117647058826;
+    // }
 
-    color /= _KernelSize;
+    // color /= _KernelSize;
     
-    gl_FragColor = vec4(_KernelSize, 1.0);
+    gl_FragColor = vec4(color, 1.0);
  }
 
   
