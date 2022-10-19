@@ -8,11 +8,19 @@ const SAVE_DELAY_MS = 300;
 
 export default function ColorCorrectionProvider({ children }) {
   const logError = useErrorLogger();
+
   const [blur, setBlur] = useState(0);
   const [saturation, setSaturation] = useState(0);
   const [brightness, setBrightness] = useState(0);
   const [contrast, setContrast] = useState(0);
   const [exposure, setExposure] = useState(0);
+
+  const [blurRef, setBlurRef] = useState(0);
+  const [saturationRef, setSaturationRef] = useState(0);
+  const [brightnessRef, setBrightnessRef] = useState(0);
+  const [contrastRef, setContrastRef] = useState(0);
+  const [exposureRef, setExposureRef] = useState(0);
+
   const value = useMemo(
     () => ({
       blur,
@@ -25,8 +33,29 @@ export default function ColorCorrectionProvider({ children }) {
       setBrightness,
       setContrast,
       setExposure,
+      blurRef,
+      saturationRef,
+      brightnessRef,
+      contrastRef,
+      exposureRef,
+      setBlurRef,
+      setSaturationRef,
+      setBrightnessRef,
+      setContrastRef,
+      setExposureRef,
     }),
-    [blur, brightness, contrast, exposure, saturation]
+    [
+      blur,
+      blurRef,
+      brightness,
+      brightnessRef,
+      contrast,
+      contrastRef,
+      exposure,
+      exposureRef,
+      saturation,
+      saturationRef,
+    ]
   );
 
   const hasSetInitialStateFromStore = useRef(false);

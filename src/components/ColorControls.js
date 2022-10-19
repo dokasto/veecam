@@ -1,5 +1,5 @@
 import { createUseStyles } from "react-jss";
-import React, { useContext, useCallback } from "react";
+import React, { useContext, useCallback, useRef, useEffect } from "react";
 import ColorCorrectionContext from "../data_providers/ColorCorrectionContext";
 
 const useStyles = createUseStyles({
@@ -36,12 +36,23 @@ export default function ColorControls() {
     brightness,
     contrast,
     exposure,
+    setBlurRef,
     setBlur,
     setSaturation,
     setBrightness,
     setContrast,
     setExposure,
+    setSaturationRef,
+    setBrightnessRef,
+    setContrastRef,
+    setExposureRef,
   } = useContext(ColorCorrectionContext);
+
+  const blurRef = useRef(null);
+  const exposureRef = useRef(null);
+  const contrastRef = useRef(null);
+  const saturationRef = useRef(null);
+  const brightnessRef = useRef(null);
 
   const onBlurChange = (e) => {
     setBlur(e.target.value);
@@ -63,6 +74,34 @@ export default function ColorControls() {
     setSaturation(e.target.value);
   };
 
+  useEffect(() => {
+    if (blurRef != null) {
+      setBlurRef(blurRef);
+    }
+
+    if (saturationRef != null) {
+      setSaturationRef(saturationRef);
+    }
+
+    if (brightnessRef != null) {
+      setBrightnessRef(brightnessRef);
+    }
+
+    if (contrastRef != null) {
+      setContrastRef(contrastRef);
+    }
+
+    if (exposureRef != null) {
+      setExposureRef(exposureRef);
+    }
+  }, [
+    setBlurRef,
+    setBrightnessRef,
+    setContrastRef,
+    setExposureRef,
+    setSaturationRef,
+  ]);
+
   const onReset = useCallback(() => {
     setBlur(0);
     setBrightness(0);
@@ -77,6 +116,7 @@ export default function ColorControls() {
       <div className={classes.control}>
         <label htmlFor="blur">Background Blur</label>
         <input
+          ref={blurRef}
           value={blur}
           step={STEP}
           min={MIN}
@@ -89,6 +129,7 @@ export default function ColorControls() {
       <div className={classes.control}>
         <label htmlFor="exposure">exposure</label>
         <input
+          ref={exposureRef}
           step={STEP}
           min={MIN}
           max={MAX}
@@ -101,6 +142,7 @@ export default function ColorControls() {
       <div className={classes.control}>
         <label htmlFor="contrast">contrast</label>
         <input
+          ref={contrastRef}
           step={STEP}
           min={MIN}
           max={MAX}
@@ -113,6 +155,7 @@ export default function ColorControls() {
       <div className={classes.control}>
         <label htmlFor="saturation">saturation</label>
         <input
+          ref={saturationRef}
           step={STEP}
           min={MIN}
           max={MAX}
@@ -125,6 +168,7 @@ export default function ColorControls() {
       <div className={classes.control}>
         <label htmlFor="brightness">brightness</label>
         <input
+          ref={brightnessRef}
           step={STEP}
           min={MIN}
           max={MAX}

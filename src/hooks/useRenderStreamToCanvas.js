@@ -17,15 +17,10 @@ export default function useRenderStreamToCanvas(canvas) {
   const hasInitializedRenderer = useRef(false);
   const segmenterRef = useRef(null);
   const requestAnimationFrameRef = useRef(null);
-  const { saturation, brightness, contrast, exposure } = useContext(
+  const { saturationRef, brightnessRef, contrastRef, exposureRef } = useContext(
     ColorCorrectionContext
   );
-  const renderer = useRenderer({
-    exposure,
-    contrast,
-    saturation,
-    brightness,
-  });
+  const rendererRef = useRef(useRenderer());
 
   useEffect(() => {
     if (segmenterRef.current != null) {
@@ -82,15 +77,13 @@ export default function useRenderStreamToCanvas(canvas) {
   useEffect(() => {
     return () => {
       if (hasInitializedRenderer.current) {
-        renderer.destroy();
+        rendererRef.current.destroy();
         hasInitializedRenderer.current = false;
       }
     };
-  }, [renderer]);
+  }, []);
 
   const loop = useCallback(async () => {
-    const fps = 10;
-
     // first initialize renderer
     if (
       !hasInitializedRenderer.current &&
@@ -100,20 +93,12 @@ export default function useRenderStreamToCanvas(canvas) {
     ) {
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
-      renderer.init(glContextRef.current, videoRef.current);
+      rendererRef.current.init(glContextRef.current, videoRef.current);
       hasInitializedRenderer.current = true;
     }
 
     const isVideoReady =
       hasInitializedRenderer.current && videoRef.current.videoWidth > 0;
-
-    // if (isVideoReady) {
-    //   renderer.render(videoRef.current, videoRef.current, {
-    //     saturation,
-    //     brightness,
-    //     contrast,
-    //     exposure,
-    //   });
 
     if (isVideoReady && segmenterRef.current != null) {
       const segmentation = await segmenterRef.current.segmentPeople(
@@ -121,18 +106,16 @@ export default function useRenderStreamToCanvas(canvas) {
       );
       const [people] = segmentation;
       const segmentedImageData = await people.mask.toImageData();
-      renderer.render(videoRef.current, segmentedImageData, {
-        saturation,
-        brightness,
-        contrast,
-        exposure,
+      rendererRef.current.render(videoRef.current, segmentedImageData, {
+        saturation: saturationRef.current?.value,
+        brightness: brightnessRef.current?.value,
+        contrast: contrastRef.current?.value,
+        exposure: exposureRef.current?.value,
       });
     }
 
-    window.setTimeout(() => {
-      requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
-    }, 1000 / fps);
-  }, [brightness, canvas, contrast, exposure, renderer, saturation]);
+    requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
+  }, [brightnessRef, canvas, contrastRef, exposureRef, saturationRef]);
 
   // run render loop
   useEffect(() => {
