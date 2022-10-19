@@ -7,7 +7,7 @@ import useRenderer from "../hooks/useRenderer";
 import "@tensorflow/tfjs-core";
 import "@tensorflow/tfjs-backend-webgl";
 import * as bodySegmentation from "@tensorflow-models/body-segmentation";
-// import "@mediapipe/selfie_segmentation/selfie_segmentation";
+import "@mediapipe/selfie_segmentation/selfie_segmentation";
 import "@tensorflow/tfjs-converter";
 
 export default function useRenderStreamToCanvas(canvas) {
@@ -20,6 +20,7 @@ export default function useRenderStreamToCanvas(canvas) {
   const { blurRef, saturationRef, brightnessRef, contrastRef, exposureRef } =
     useContext(ColorCorrectionContext);
   const rendererRef = useRef(useRenderer());
+  const offScreenCanvasRef = useRef(document.createElement("canvas"));
 
   useEffect(() => {
     if (segmenterRef.current != null) {
@@ -92,21 +93,39 @@ export default function useRenderStreamToCanvas(canvas) {
     ) {
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
-      rendererRef.current.init(glContextRef.current, videoRef.current);
+      offScreenCanvasRef.current.width = videoRef.current.videoWidth;
+      offScreenCanvasRef.current.height = videoRef.current.videoHeight;
+      rendererRef.current.init(glContextRef.current);
       hasInitializedRenderer.current = true;
     }
 
     const isVideoReady =
       hasInitializedRenderer.current && videoRef.current.videoWidth > 0;
 
-    if (isVideoReady && segmenterRef.current != null) {
+    if (isVideoReady && segmenterRef.current != null && canvas != null) {
       const segmentation = await segmenterRef.current.segmentPeople(
         videoRef.current
       );
-      const [people] = segmentation;
-      const segmentedImageData = await people.mask.toImageData();
-      rendererRef.current.render(videoRef.current, segmentedImageData, {
-        blur: blurRef.current?.value,
+
+      const foregroundThreshold = 0.5;
+      const edgeBlurAmount = 3;
+      const flipHorizontal = false;
+
+      try {
+        await bodySegmentation.drawBokehEffect(
+          offScreenCanvasRef.current,
+          videoRef.current,
+          segmentation,
+          foregroundThreshold,
+          blurRef.current?.value ?? 0,
+          edgeBlurAmount,
+          flipHorizontal
+        );
+      } catch (e) {
+        console.error(e);
+      }
+
+      rendererRef.current.render(offScreenCanvasRef.current, {
         saturation: saturationRef.current?.value,
         brightness: brightnessRef.current?.value,
         contrast: contrastRef.current?.value,

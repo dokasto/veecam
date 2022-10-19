@@ -23,7 +23,7 @@ export default function useRenderer() {
     programRef.current = createProgram(gl, vertexShader, fragmentShader);
   }, []);
 
-  const render = useCallback((video, segmentedVideo, colorCorrectionParams) => {
+  const render = useCallback((video, colorCorrectionParams) => {
     const gl = glRef.current;
     const program = programRef.current;
 
@@ -42,8 +42,7 @@ export default function useRenderer() {
     // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
-    // Set a rectangle the same size as the image.
-    setRectangle(gl, 0, 0, video.videoWidth, video.videoHeight);
+    setRectangle(gl, 0, 0, video.width, video.height);
 
     // provide texture coordinates for the rectangle.
     const texcoordBuffer = gl.createBuffer();
@@ -58,17 +57,11 @@ export default function useRenderer() {
 
     // Create a texture.
     const videoTexture = initTexture(gl, gl.TEXTURE7);
-    const segmentedVideoTexture = initTexture(gl, gl.TEXTURE4);
 
     updateTexture(gl, videoTexture, video);
-    updateTexture(gl, segmentedVideoTexture, segmentedVideo);
 
     const resolutionLocation = gl.getUniformLocation(program, "u_resolution");
     const videoFrameLocation = gl.getUniformLocation(program, "u_video_frame");
-    const segmentedVideoFrameLocation = gl.getUniformLocation(
-      program,
-      "u_segmented_video_frame"
-    );
 
     // set the color correction uniform params
     const uniformParams = [];
@@ -128,7 +121,6 @@ export default function useRenderer() {
     // set the resolution
     gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
     gl.uniform1i(videoFrameLocation, 7);
-    gl.uniform1i(segmentedVideoFrameLocation, 4);
 
     // set the params
     for (const param of uniformParams) {

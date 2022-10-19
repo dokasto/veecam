@@ -118,9 +118,9 @@ export default function ColorControls() {
         <input
           ref={blurRef}
           value={blur}
-          step={STEP}
-          min={MIN}
-          max={MAX}
+          step={1}
+          min={0}
+          max={20}
           id="blur"
           type="range"
           onChange={onBlurChange}
