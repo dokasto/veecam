@@ -1,6 +1,7 @@
-import React, { useRef } from "react";
+import React, { useRef, useContext } from "react";
 import { createUseStyles } from "react-jss";
 import useRenderStreamToCanvas from "../hooks/useRenderStreamToCanvas";
+import MediaStreamContext from "../data_providers/MediaStreamContext";
 
 const useStyles = createUseStyles({
   root: {
@@ -18,7 +19,9 @@ const useStyles = createUseStyles({
 export default function SelfView() {
   const classes = useStyles();
   const canvasRef = useRef(null);
-  useRenderStreamToCanvas(canvasRef.current);
+  const { stream } = useContext(MediaStreamContext);
+
+  useRenderStreamToCanvas(canvasRef.current, stream);
 
   return (
     <div id="canvas-container" className={classes.root}>

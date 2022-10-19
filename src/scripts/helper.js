@@ -20,7 +20,7 @@ export function monkeyPatchEnumerateDevices(virtualDevice) {
   };
 }
 
-export function monkeyPatchGetUserMedia(virtualDeviceId) {
+export function monkeyPatchGetUserMedia(virtualDeviceId, callback) {
   const getUserMediaFn = navigator.mediaDevices.getUserMedia.bind(
     navigator.mediaDevices
   );
@@ -31,6 +31,7 @@ export function monkeyPatchGetUserMedia(virtualDeviceId) {
           removeDeviceIDFromConstraint(constraints, virtualDeviceId),
           ...args
         ).then((stream) => {
+          callback(stream);
           return applyFilter(stream);
         })
       : getUserMediaFn(constraints, ...args);

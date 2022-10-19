@@ -1,5 +1,4 @@
-import { useRef, useContext, useEffect, useCallback } from "react";
-import ColorCorrectionContext from "../data_providers/ColorCorrectionContext";
+import { useRef, useEffect, useCallback } from "react";
 import useRenderer from "../hooks/useRenderer";
 
 /* Tensor flow */
@@ -9,14 +8,12 @@ import * as bodySegmentation from "@tensorflow-models/body-segmentation";
 import "@mediapipe/selfie_segmentation/selfie_segmentation";
 import "@tensorflow/tfjs-converter";
 
-export default function useRenderStreamToCanvas(canvas, stream) {
+export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
   const videoRef = useRef(null);
   const glContextRef = useRef(null);
   const hasInitializedRenderer = useRef(false);
   const segmenterRef = useRef(null);
   const requestAnimationFrameRef = useRef(null);
-  const { blurRef, saturationRef, brightnessRef, contrastRef, exposureRef } =
-    useContext(ColorCorrectionContext);
   const rendererRef = useRef(useRenderer());
   const offScreenCanvasRef = useRef(document.createElement("canvas"));
 
@@ -115,7 +112,7 @@ export default function useRenderStreamToCanvas(canvas, stream) {
           videoRef.current,
           segmentation,
           foregroundThreshold,
-          blurRef.current?.value ?? 0,
+          params.blur,
           edgeBlurAmount,
           flipHorizontal
         );
@@ -124,15 +121,22 @@ export default function useRenderStreamToCanvas(canvas, stream) {
       }
 
       rendererRef.current.render(offScreenCanvasRef.current, {
-        saturation: saturationRef.current?.value,
-        brightness: brightnessRef.current?.value,
-        contrast: contrastRef.current?.value,
-        exposure: exposureRef.current?.value,
+        saturation: params.saturation,
+        brightness: params.brightness,
+        contrast: params.contrast,
+        exposure: params.exposure,
       });
     }
 
     requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
-  }, [blurRef, brightnessRef, canvas, contrastRef, exposureRef, saturationRef]);
+  }, [
+    canvas,
+    params.blur,
+    params.brightness,
+    params.contrast,
+    params.exposure,
+    params.saturation,
+  ]);
 
   // run render loop
   useEffect(() => {
