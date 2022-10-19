@@ -19,22 +19,22 @@ function Root() {
   monkeyPatchEnumerateDevices(VIRTUAL_DEVICE);
 
   const [mediaStream, setMediaStream] = useState(null);
-  const hasFetchedStoredPrefs = useState(false);
+  const [params, setParams] = useState({
+    blur: 4,
+    saturation: 0.3,
+    brightness: 0.3,
+    contrast: 0.3,
+    exposure: 0.3,
+  });
 
   // create offscreen canvas
   const canvasRef = useRef(document.createElement("canvas"));
-  const params = {};
-
-  useEffect(() => {
-    if (hasFetchedStoredPrefs.current) {
-      return;
-    }
-    hasFetchedStoredPrefs.current = true;
-  }, []);
+  document.getElementsByTagName("body")[0]?.appendChild(canvasRef.current);
 
   useRenderStreamToOfflineCanvas(canvasRef.current, mediaStream, params);
 
   const onMediaStreamRequest = useCallback((stream) => {
+    console.log("stream", stream);
     setMediaStream(stream);
   }, []);
 
@@ -43,7 +43,7 @@ function Root() {
 
 try {
   const div = document.createElement("div");
-  document.getElementsByTagName("body")[0].appendChild(div);
+  document.getElementsByTagName("body")[0]?.appendChild(div);
   const root = createRoot(div);
   root.render(<Root />);
   console.info("VeeCam Installed");

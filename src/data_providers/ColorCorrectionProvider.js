@@ -2,8 +2,11 @@ import React, { useRef, useEffect, useMemo, useState } from "react";
 import ColorCorrectionContext from "./ColorCorrectionContext";
 import PropTypes from "prop-types";
 import useErrorLogger from "../hooks/useErrorLogger";
+import {
+  useGetStoredColorCorrectionPrefs,
+  useSaveColorCorrectionPrefs,
+} from "../hooks/storageHooks";
 
-const KEY = "VEECAM:COLOR_CORRECTION_KEY";
 const SAVE_DELAY_MS = 300;
 
 export default function ColorCorrectionProvider({ children }) {
@@ -20,6 +23,9 @@ export default function ColorCorrectionProvider({ children }) {
   const [brightnessRef, setBrightnessRef] = useState(0);
   const [contrastRef, setContrastRef] = useState(0);
   const [exposureRef, setExposureRef] = useState(0);
+
+  const getStoredPrefs = useGetStoredColorCorrectionPrefs();
+  const saveColorCorrectionPrefs = useSaveColorCorrectionPrefs();
 
   const value = useMemo(
     () => ({
@@ -65,28 +71,15 @@ export default function ColorCorrectionProvider({ children }) {
       return;
     }
 
-    // eslint-disable-next-line no-undef
-    chrome.storage.sync.get(KEY, function (data) {
-      try {
-        if (data != null && KEY in data && data[KEY] != null) {
-          const pref = JSON.parse(data[KEY]);
-          pref?.blur != null && setBlur(pref.blur);
-          pref?.saturation != null && setSaturation(pref.saturation);
-          pref?.brightness != null && setBrightness(pref.brightness);
-          pref?.contrast != null && setContrast(pref.contrast);
-          pref?.exposure != null && setExposure(pref.exposure);
-        }
-      } catch (e) {
-        logError(
-          "ColorCorrectionProvider",
-          "failed to load color correction data from store",
-          e
-        );
-      } finally {
-        hasSetInitialStateFromStore.current = true;
-      }
+    getStoredPrefs().then((pref) => {
+      pref?.blur != null && setBlur(pref.blur);
+      pref?.saturation != null && setSaturation(pref.saturation);
+      pref?.brightness != null && setBrightness(pref.brightness);
+      pref?.contrast != null && setContrast(pref.contrast);
+      pref?.exposure != null && setExposure(pref.exposure);
+      hasSetInitialStateFromStore.current = true;
     });
-  }, [logError]);
+  }, [getStoredPrefs, logError]);
 
   const lastTime = useRef(null);
 
@@ -106,17 +99,21 @@ export default function ColorCorrectionProvider({ children }) {
 
     lastTime.current = currentTime;
 
-    // eslint-disable-next-line no-undef
-    chrome.storage.sync.set({
-      [KEY]: JSON.stringify({
-        blur,
-        saturation,
-        brightness,
-        contrast,
-        exposure,
-      }),
+    saveColorCorrectionPrefs({
+      blur,
+      saturation,
+      brightness,
+      contrast,
+      exposure,
     });
-  }, [blur, brightness, contrast, exposure, saturation]);
+  }, [
+    blur,
+    brightness,
+    contrast,
+    exposure,
+    saturation,
+    saveColorCorrectionPrefs,
+  ]);
 
   return (
     <ColorCorrectionContext.Provider value={value}>

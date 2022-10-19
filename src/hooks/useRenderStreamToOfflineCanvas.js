@@ -45,14 +45,15 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
       videoRef.current = document.createElement("video");
     }
 
-    videoRef.current.addEventListener("playing", onVideoPlay);
-    videoRef.current.srcObject = stream;
-    videoRef.current.play();
+    if (stream != null) {
+      videoRef.current.addEventListener("playing", onVideoPlay);
+      videoRef.current.srcObject = stream;
+      videoRef.current.autoplay = true;
+    }
 
     () => {
       videoRef.current.removeEventListener("playing", onVideoPlay);
       videoRef.current.srcObject = null;
-      videoRef.current.stop();
     };
   }, [onVideoPlay, stream]);
 
@@ -102,6 +103,8 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
         videoRef.current
       );
 
+      console.log("rendering");
+
       const foregroundThreshold = 0.5;
       const edgeBlurAmount = 3;
       const flipHorizontal = false;
@@ -141,7 +144,7 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
   // run render loop
   useEffect(() => {
     if (requestAnimationFrameRef.current == null) {
-      requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
+      // requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
     }
 
     return () => {
