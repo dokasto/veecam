@@ -17,9 +17,8 @@ export default function useRenderStreamToCanvas(canvas) {
   const hasInitializedRenderer = useRef(false);
   const segmenterRef = useRef(null);
   const requestAnimationFrameRef = useRef(null);
-  const { saturationRef, brightnessRef, contrastRef, exposureRef } = useContext(
-    ColorCorrectionContext
-  );
+  const { blurRef, saturationRef, brightnessRef, contrastRef, exposureRef } =
+    useContext(ColorCorrectionContext);
   const rendererRef = useRef(useRenderer());
 
   useEffect(() => {
@@ -107,6 +106,7 @@ export default function useRenderStreamToCanvas(canvas) {
       const [people] = segmentation;
       const segmentedImageData = await people.mask.toImageData();
       rendererRef.current.render(videoRef.current, segmentedImageData, {
+        blur: blurRef.current?.value,
         saturation: saturationRef.current?.value,
         brightness: brightnessRef.current?.value,
         contrast: contrastRef.current?.value,
@@ -115,7 +115,7 @@ export default function useRenderStreamToCanvas(canvas) {
     }
 
     requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
-  }, [brightnessRef, canvas, contrastRef, exposureRef, saturationRef]);
+  }, [blurRef, brightnessRef, canvas, contrastRef, exposureRef, saturationRef]);
 
   // run render loop
   useEffect(() => {
