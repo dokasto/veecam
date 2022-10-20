@@ -1,6 +1,7 @@
 import React, { useRef, useCallback, useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import useRenderStreamToOfflineCanvas from "../hooks/useRenderStreamToOfflineCanvas";
+import { EXTENSION_SCRIPT_TAG_ID } from "../constants";
 
 import {
   generateUniqueID,
@@ -15,7 +16,7 @@ const VIRTUAL_DEVICE = {
   kind: "videoinput",
 };
 
-function Root() {
+function Root({ prefs }) {
   monkeyPatchEnumerateDevices(VIRTUAL_DEVICE);
 
   const [mediaStream, setMediaStream] = useState(null);
@@ -33,7 +34,11 @@ function Root() {
 
   document.getElementsByTagName("body")[0]?.appendChild(canvasRef.current);
 
-  useRenderStreamToOfflineCanvas(canvasRef.current, mediaStream, params);
+  useRenderStreamToOfflineCanvas(
+    canvasRef.current,
+    mediaStream,
+    prefs.colorCorrectionPrefs
+  );
 
   const onMediaStreamRequest = useCallback((stream) => {
     console.log("stream", stream);
@@ -42,6 +47,7 @@ function Root() {
 
   monkeyPatchGetUserMedia(
     VIRTUAL_DEVICE.deviceId,
+    prefs.devicePrefs.video,
     onMediaStreamRequest,
     canvasRef.current
   );
@@ -51,7 +57,9 @@ try {
   const div = document.createElement("div");
   document.getElementsByTagName("body")[0]?.appendChild(div);
   const root = createRoot(div);
-  root.render(<Root />);
+  const script = document.getElementById(EXTENSION_SCRIPT_TAG_ID);
+  const prefs = script.getAttribute("prefs");
+  root.render(<Root prefs={JSON.parse(prefs)} />);
   console.info("VeeCam Installed");
 } catch (e) {
   console.error(e, " could not install VeeCam");

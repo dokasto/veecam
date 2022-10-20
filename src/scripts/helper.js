@@ -1,6 +1,4 @@
-/**
- * Utility functions
- */
+import { VIDEO_MEDIA_CONSTRAINT } from "../constants";
 
 export function generateUniqueID() {
   return (
@@ -20,21 +18,34 @@ export function monkeyPatchEnumerateDevices(virtualDevice) {
   };
 }
 
-export function monkeyPatchGetUserMedia(virtualDeviceId, callback, canvas) {
+export function monkeyPatchGetUserMedia(
+  virtualDeviceId,
+  soureVideoDeviceId,
+  callback,
+  canvas
+) {
   const getUserMediaFn = navigator.mediaDevices.getUserMedia.bind(
     navigator.mediaDevices
   );
 
   navigator.mediaDevices.getUserMedia = function (constraints, ...args) {
-    return shouldIntercept(constraints, virtualDeviceId)
-      ? getUserMediaFn(
-          removeDeviceIDFromConstraint(constraints, virtualDeviceId),
-          ...args
-        ).then((stream) => {
-          callback(stream);
-          return canvas.captureStream(50);
-        })
-      : getUserMediaFn(constraints, ...args);
+    if (shouldIntercept(constraints, virtualDeviceId)) {
+      const newConstraints = {
+        video: {
+          ...VIDEO_MEDIA_CONSTRAINT,
+          deviceId: { exact: soureVideoDeviceId },
+        },
+        audio: constraints?.audio ?? false,
+      };
+
+      console.log("newConstraints", newConstraints);
+
+      return getUserMediaFn(newConstraints).then((stream) => {
+        callback(stream);
+        return canvas.captureStream(50);
+      });
+    }
+    return getUserMediaFn(constraints, ...args);
   };
 }
 
