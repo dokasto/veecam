@@ -43,12 +43,15 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
   useEffect(() => {
     if (videoRef.current == null) {
       videoRef.current = document.createElement("video");
+      document.getElementsByTagName("body")[0]?.prepend(videoRef.current);
     }
 
     if (stream != null) {
       videoRef.current.addEventListener("playing", onVideoPlay);
-      videoRef.current.srcObject = stream;
       videoRef.current.autoplay = true;
+      videoRef.current.srcObject = stream;
+      videoRef.current.play();
+      console.log("vee", "start playing");
     }
 
     () => {
@@ -103,11 +106,11 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
         videoRef.current
       );
 
-      console.log("rendering");
-
       const foregroundThreshold = 0.5;
       const edgeBlurAmount = 3;
       const flipHorizontal = false;
+
+      console.log("rendering");
 
       try {
         await bodySegmentation.drawBokehEffect(
@@ -144,7 +147,7 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
   // run render loop
   useEffect(() => {
     if (requestAnimationFrameRef.current == null) {
-      // requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
+      requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
     }
 
     return () => {

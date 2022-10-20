@@ -29,6 +29,8 @@ function Root() {
 
   // create offscreen canvas
   const canvasRef = useRef(document.createElement("canvas"));
+  // const streamFromCanvas = useRef(canvasRef.current.captureStream(50));
+
   document.getElementsByTagName("body")[0]?.appendChild(canvasRef.current);
 
   useRenderStreamToOfflineCanvas(canvasRef.current, mediaStream, params);
@@ -38,7 +40,11 @@ function Root() {
     setMediaStream(stream);
   }, []);
 
-  monkeyPatchGetUserMedia(VIRTUAL_DEVICE.deviceId, onMediaStreamRequest);
+  monkeyPatchGetUserMedia(
+    VIRTUAL_DEVICE.deviceId,
+    onMediaStreamRequest,
+    canvasRef.current
+  );
 }
 
 try {

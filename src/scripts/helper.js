@@ -20,7 +20,7 @@ export function monkeyPatchEnumerateDevices(virtualDevice) {
   };
 }
 
-export function monkeyPatchGetUserMedia(virtualDeviceId, callback) {
+export function monkeyPatchGetUserMedia(virtualDeviceId, callback, canvas) {
   const getUserMediaFn = navigator.mediaDevices.getUserMedia.bind(
     navigator.mediaDevices
   );
@@ -32,7 +32,7 @@ export function monkeyPatchGetUserMedia(virtualDeviceId, callback) {
           ...args
         ).then((stream) => {
           callback(stream);
-          return applyFilter(stream);
+          return canvas.captureStream(50);
         })
       : getUserMediaFn(constraints, ...args);
   };
