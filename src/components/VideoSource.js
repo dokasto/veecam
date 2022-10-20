@@ -31,7 +31,7 @@ export default function VideoSource() {
     <div className={classes.root}>
       <label htmlFor="cameras">Choose Camera</label>
       <select
-        defaultValue={video}
+        value={video ?? ""}
         name="cameras"
         onChange={onChange}
         id="cameras"

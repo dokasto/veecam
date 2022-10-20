@@ -3,9 +3,9 @@ import ColorCorrectionContext from "./ColorCorrectionContext";
 import PropTypes from "prop-types";
 import useErrorLogger from "../hooks/useErrorLogger";
 import {
-  useGetStoredColorCorrectionPrefs,
-  useSaveColorCorrectionPrefs,
-} from "../hooks/storageHooks";
+  getStoredColorCorrectionPrefs,
+  saveColorCorrectionPrefs,
+} from "../utils/storage";
 
 const SAVE_DELAY_MS = 300;
 
@@ -23,9 +23,6 @@ export default function ColorCorrectionProvider({ children }) {
   const [brightnessRef, setBrightnessRef] = useState(0);
   const [contrastRef, setContrastRef] = useState(0);
   const [exposureRef, setExposureRef] = useState(0);
-
-  const getStoredPrefs = useGetStoredColorCorrectionPrefs();
-  const saveColorCorrectionPrefs = useSaveColorCorrectionPrefs();
 
   const value = useMemo(
     () => ({
@@ -71,15 +68,23 @@ export default function ColorCorrectionProvider({ children }) {
       return;
     }
 
-    getStoredPrefs().then((pref) => {
-      pref?.blur != null && setBlur(pref.blur);
-      pref?.saturation != null && setSaturation(pref.saturation);
-      pref?.brightness != null && setBrightness(pref.brightness);
-      pref?.contrast != null && setContrast(pref.contrast);
-      pref?.exposure != null && setExposure(pref.exposure);
-      hasSetInitialStateFromStore.current = true;
-    });
-  }, [getStoredPrefs, logError]);
+    getStoredColorCorrectionPrefs()
+      .then((pref) => {
+        pref?.blur != null && setBlur(pref.blur);
+        pref?.saturation != null && setSaturation(pref.saturation);
+        pref?.brightness != null && setBrightness(pref.brightness);
+        pref?.contrast != null && setContrast(pref.contrast);
+        pref?.exposure != null && setExposure(pref.exposure);
+        hasSetInitialStateFromStore.current = true;
+      })
+      .catch((e) => {
+        logError(
+          "ColorCorrectionProvider",
+          "failed to fetch stored color correction prefs",
+          e
+        );
+      });
+  }, [logError]);
 
   const lastTime = useRef(null);
 
@@ -106,14 +111,7 @@ export default function ColorCorrectionProvider({ children }) {
       contrast,
       exposure,
     });
-  }, [
-    blur,
-    brightness,
-    contrast,
-    exposure,
-    saturation,
-    saveColorCorrectionPrefs,
-  ]);
+  }, [blur, brightness, contrast, exposure, saturation]);
 
   return (
     <ColorCorrectionContext.Provider value={value}>

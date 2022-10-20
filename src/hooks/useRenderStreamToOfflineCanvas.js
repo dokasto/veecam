@@ -110,8 +110,6 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
       const edgeBlurAmount = 3;
       const flipHorizontal = false;
 
-      console.log("rendering");
-
       try {
         await bodySegmentation.drawBokehEffect(
           offScreenCanvasRef.current,
