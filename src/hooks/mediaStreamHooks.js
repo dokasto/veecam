@@ -3,7 +3,6 @@ import MediaDevicesContext from "../data_providers/MediaDevicesContext";
 import MediaStreamContext from "../data_providers/MediaStreamContext";
 import useErrorLogger from "./useErrorLogger";
 import { getStoredDevicePrefs } from "../utils/storage";
-import { VIDEO_MEDIA_CONSTRAINT } from "../constants";
 
 export function useFetchMediaStream() {
   const logError = useErrorLogger();

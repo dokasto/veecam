@@ -17,24 +17,28 @@ export default function MediaDevicesProvider({ children }) {
   const logError = useErrorLogger();
   const hasFetchedStoredData = useRef(false);
 
-  const setDevices = useCallback((deviceList) => {
-    _setDevices(deviceList);
-  }, []);
+  const setDevices = useCallback(
+    (deviceList) => {
+      _setDevices(deviceList);
+      saveDevicePrefs({ video, audio, devices: deviceList });
+    },
+    [audio, video]
+  );
 
   const setVideo = useCallback(
     (videoSourceId) => {
       _setVideo(videoSourceId);
-      saveDevicePrefs({ video: videoSourceId, audio });
+      saveDevicePrefs({ video: videoSourceId, audio, devices });
     },
-    [audio]
+    [audio, devices]
   );
 
   const setAudio = useCallback(
     (audioSourceId) => {
       _setAudio(audioSourceId);
-      saveDevicePrefs({ video, audio: audioSourceId });
+      saveDevicePrefs({ video, audio: audioSourceId, devices });
     },
-    [video]
+    [devices, video]
   );
 
   useEffect(() => {

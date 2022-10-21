@@ -43,7 +43,6 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
   useEffect(() => {
     if (videoRef.current == null) {
       videoRef.current = document.createElement("video");
-      document.getElementsByTagName("body")[0]?.prepend(videoRef.current);
     }
 
     if (stream != null) {
@@ -51,7 +50,6 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
       videoRef.current.autoplay = true;
       videoRef.current.srcObject = stream;
       videoRef.current.play();
-      console.log("vee", "start playing");
     }
 
     () => {

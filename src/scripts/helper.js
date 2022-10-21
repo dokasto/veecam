@@ -14,13 +14,16 @@ export function monkeyPatchEnumerateDevices(virtualDevice) {
     navigator.mediaDevices
   );
   navigator.mediaDevices.enumerateDevices = function () {
-    return enumerateDevicesFn().then((devices) => [...devices, virtualDevice]);
+    return enumerateDevicesFn().then((devices) => {
+      // console.log("devices", devices);
+      return [...devices, virtualDevice];
+    });
   };
 }
 
 export function monkeyPatchGetUserMedia(
   virtualDeviceId,
-  soureVideoDeviceId,
+  devicePrefs,
   callback,
   canvas
 ) {
@@ -29,23 +32,35 @@ export function monkeyPatchGetUserMedia(
   );
 
   navigator.mediaDevices.getUserMedia = function (constraints, ...args) {
-    if (shouldIntercept(constraints, virtualDeviceId)) {
-      const newConstraints = {
-        video: {
-          ...VIDEO_MEDIA_CONSTRAINT,
-          deviceId: { exact: soureVideoDeviceId },
-        },
-        audio: constraints?.audio ?? false,
-      };
+    return new Promise((resolve, reject) => {
+      if (shouldIntercept(constraints, virtualDeviceId)) {
+        getSourceVideoId(devicePrefs, (soureVideoDeviceId) => {
+          const processedConstraints =
+            soureVideoDeviceId == null
+              ? { ...constraints }
+              : {
+                  audio: { ...constraints.audio },
+                  video: {
+                    ...constraints.video,
+                    deviceId: { exact: soureVideoDeviceId },
+                  },
+                };
 
-      console.log("newConstraints", newConstraints);
-
-      return getUserMediaFn(newConstraints).then((stream) => {
-        callback(stream);
-        return canvas.captureStream(50);
-      });
-    }
-    return getUserMediaFn(constraints, ...args);
+          getUserMediaFn(processedConstraints)
+            .then((stream) => {
+              const captureStream = canvas.captureStream(50);
+              callback(stream);
+              resolve(captureStream);
+              return captureStream;
+            })
+            .catch(reject);
+        });
+      } else {
+        getUserMediaFn(constraints, ...args)
+          .then(resolve)
+          .catch(reject);
+      }
+    });
   };
 }
 
@@ -72,46 +87,22 @@ function shouldIntercept(constraints, virtualDeviceId) {
   return false;
 }
 
-function removeDeviceIDFromConstraint(valueOfAnyType, virtualDeviceId) {
-  if (valueOfAnyType == null) {
-    return valueOfAnyType;
-  }
-
-  if (typeof valueOfAnyType !== "object") {
-    return valueOfAnyType;
-  }
-
-  if (Array.isArray(valueOfAnyType)) {
-    return valueOfAnyType;
-  }
-
-  const newObj = {};
-
-  for (const prop of Object.keys(valueOfAnyType)) {
-    if (prop === "deviceId") {
-      if (valueOfAnyType[prop] === virtualDeviceId) {
-        continue;
-      } else if (
-        valueOfAnyType[prop] != null &&
-        "exact" in valueOfAnyType[prop] &&
-        valueOfAnyType[prop].exact === virtualDeviceId
+function getSourceVideoId(devicePrefs, callback) {
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    const intendedDevice = devicePrefs.devices.find(
+      (device) => device.deviceId === devicePrefs.video
+    );
+    for (const device of devices) {
+      if (
+        device.label === intendedDevice.label &&
+        device.kind === intendedDevice.kind
       ) {
-        continue;
-      } else {
-        newObj[prop] = removeDeviceIDFromConstraint(
-          valueOfAnyType[prop],
-          virtualDeviceId
-        );
+        callback(device.deviceId);
+        return;
       }
-    } else {
-      newObj[prop] = removeDeviceIDFromConstraint(
-        valueOfAnyType[prop],
-        virtualDeviceId
-      );
     }
-  }
-
-  return newObj;
+    callback(null);
+  });
 }
 
 function applyFilter(stream) {
