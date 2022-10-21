@@ -15,7 +15,11 @@ export function monkeyPatchEnumerateDevices(virtualDevice) {
   );
   navigator.mediaDevices.enumerateDevices = function () {
     return enumerateDevicesFn().then((devices) => {
-      // console.log("devices", devices);
+      for (const device of devices) {
+        if (device.deviceId === virtualDevice.deviceId) {
+          return [...devices];
+        }
+      }
       return [...devices, virtualDevice];
     });
   };
@@ -48,7 +52,8 @@ export function monkeyPatchGetUserMedia(
 
           getUserMediaFn(processedConstraints)
             .then((stream) => {
-              const captureStream = canvas.captureStream(50);
+              const captureStream = canvas.captureStream();
+              // TODO: This returns BGRA which breaks on Zoom calls
               callback(stream);
               resolve(captureStream);
               return captureStream;
