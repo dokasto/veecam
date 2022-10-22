@@ -51,7 +51,7 @@ export function monkeyPatchGetUserMedia(
           getUserMediaFn(processedConstraints)
             .then((stream) => {
               const captureStream = canvas.captureStream();
-              // TODO: This returns BGRA which breaks on Zoom calls
+              // TODO - This returns BGRA which breaks on Zoom calls
               callback(stream);
               resolve(captureStream);
               return captureStream;
