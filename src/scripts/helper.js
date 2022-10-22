@@ -1,5 +1,3 @@
-import { VIDEO_MEDIA_CONSTRAINT } from "../constants";
-
 export function generateUniqueID() {
   return (
     Math.random().toString(32).slice(-10) +
@@ -108,13 +106,4 @@ function getSourceVideoId(devicePrefs, callback) {
     }
     callback(null);
   });
-}
-
-function applyFilter(stream) {
-  /**
-   * - Record meeting with full transcription
-   * - Raise hands in meetings
-   * - Playback a presentation
-   */
-  return stream;
 }
