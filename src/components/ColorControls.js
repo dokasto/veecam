@@ -24,8 +24,6 @@ const useStyles = createUseStyles({
   },
 });
 
-const MIN = -1.0;
-const MAX = 1.0;
 const STEP = 0.01;
 
 export default function ColorControls() {
@@ -131,8 +129,8 @@ export default function ColorControls() {
         <input
           ref={exposureRef}
           step={STEP}
-          min={MIN}
-          max={MAX}
+          min={-0.34}
+          max={1.0}
           value={exposure}
           id="exposure"
           type="range"
@@ -144,8 +142,8 @@ export default function ColorControls() {
         <input
           ref={contrastRef}
           step={STEP}
-          min={MIN}
-          max={MAX}
+          min={-0.7}
+          max={2.0}
           value={contrast}
           id="contrast"
           type="range"
@@ -157,8 +155,8 @@ export default function ColorControls() {
         <input
           ref={saturationRef}
           step={STEP}
-          min={MIN}
-          max={MAX}
+          min={0}
+          max={2.0}
           value={saturation}
           id="saturation"
           type="range"
@@ -170,8 +168,8 @@ export default function ColorControls() {
         <input
           ref={brightnessRef}
           step={STEP}
-          min={MIN}
-          max={MAX}
+          min={-0.34}
+          max={0.3}
           value={brightness}
           id="brightness"
           type="range"
