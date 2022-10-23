@@ -1,6 +1,7 @@
 import { useRef, useContext, useEffect, useCallback } from "react";
 import ColorCorrectionContext from "../data_providers/ColorCorrectionContext";
 import useRenderer from "../hooks/useRenderer";
+import { SEGMENTER_CONFIG } from "../constants";
 
 /* Tensor flow */
 import "@tensorflow/tfjs-core";
@@ -25,13 +26,9 @@ export default function useRenderStreamToCanvas(canvas, stream) {
       return;
     }
     const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
-    const segmenterConfig = {
-      runtime: "tfjs", // mediapipe/tfjs
-      modelType: "general",
-    };
 
     bodySegmentation
-      .createSegmenter(model, segmenterConfig)
+      .createSegmenter(model, SEGMENTER_CONFIG)
       .then((segmenter) => {
         segmenterRef.current = segmenter;
       });

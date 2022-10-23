@@ -20,7 +20,12 @@ Promise.all([getStoredColorCorrectionPrefs(), getStoredDevicePrefs()]).then(
   (prefs) => {
     script.setAttribute(
       "prefs",
-      JSON.stringify({ colorCorrectionPrefs: prefs[0], devicePrefs: prefs[1] })
+      JSON.stringify({
+        colorCorrectionPrefs: prefs[0],
+        devicePrefs: prefs[1],
+        // eslint-disable-next-line no-undef
+        chromeExtensionBase: chrome.runtime.getURL("/"),
+      })
     );
     head.insertBefore(script, head.lastChild);
   }

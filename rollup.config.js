@@ -7,6 +7,7 @@ import autoprefixer from "autoprefixer";
 import json from "@rollup/plugin-json";
 import glslify from "rollup-plugin-glslify";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
+import copy from "rollup-plugin-copy";
 
 export default [
   {
@@ -62,6 +63,9 @@ export default [
         preventAssignment: true,
         // eslint-disable-next-line no-undef
         "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+      }),
+      copy({
+        targets: [{ src: "src/models/*", dest: "build" }],
       }),
     ],
   },

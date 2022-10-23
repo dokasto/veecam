@@ -33,7 +33,7 @@ export function monkeyPatchGetUserMedia(
     navigator.mediaDevices
   );
 
-  navigator.mediaDevices.getUserMedia = function (constraints, ...args) {
+  navigator.mediaDevices.getUserMedia = function (constraints) {
     return new Promise((resolve, reject) => {
       if (shouldIntercept(constraints, virtualDeviceId)) {
         getSourceVideoId(devicePrefs, (soureVideoDeviceId) => {
@@ -41,53 +41,54 @@ export function monkeyPatchGetUserMedia(
             soureVideoDeviceId == null
               ? { ...constraints }
               : {
-                  audio: { ...constraints.audio },
+                  ...constraints,
                   video: {
                     ...constraints.video,
-                    deviceId: { exact: soureVideoDeviceId },
+                    deviceId: { ideal: soureVideoDeviceId },
                   },
                 };
-
           getUserMediaFn(processedConstraints)
             .then((stream) => {
-              const captureStream = canvas.captureStream();
-              // TODO - This returns BGRA which breaks on Zoom calls
               callback(stream);
-              resolve(captureStream);
-              return captureStream;
+              if (soureVideoDeviceId == null) {
+                resolve(stream);
+                return stream;
+              } else {
+                const captureStream = canvas.captureStream(50);
+                // FIXME This returns BGRA which breaks on Zoom calls
+
+                // add original audio tracks to the canvas stream if any
+                stream.getTracks().forEach((track) => {
+                  if (track.kind !== "video") {
+                    captureStream.addTrack(track);
+                  }
+                });
+
+                resolve(captureStream);
+                return captureStream;
+              }
             })
             .catch(reject);
         });
       } else {
-        getUserMediaFn(constraints, ...args)
-          .then(resolve)
-          .catch(reject);
+        getUserMediaFn(constraints).then(resolve).catch(reject);
       }
     });
   };
 }
 
 function shouldIntercept(constraints, virtualDeviceId) {
-  if (typeof constraints !== "object") {
+  if (!("video" in constraints) || typeof constraints.video !== "object") {
     return false;
   }
 
-  if (Array.isArray(constraints)) {
+  try {
+    const deviceID =
+      constraints.video.deviceId.exact ?? constraints.video.deviceId.ideal;
+    return deviceID === virtualDeviceId;
+  } catch (e) {
     return false;
   }
-
-  for (const prop of Object.keys(constraints)) {
-    if (
-      (prop === "deviceId" || prop === "exact") &&
-      constraints[prop] === virtualDeviceId
-    ) {
-      return true;
-    } else if (shouldIntercept(constraints[prop], virtualDeviceId)) {
-      return true;
-    }
-  }
-
-  return false;
 }
 
 function getSourceVideoId(devicePrefs, callback) {

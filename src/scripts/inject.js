@@ -27,7 +27,8 @@ function Root({ prefs }) {
   useRenderStreamToOfflineCanvas(
     canvasRef.current,
     mediaStream,
-    prefs.colorCorrectionPrefs
+    prefs.colorCorrectionPrefs,
+    prefs.chromeExtensionBase
   );
 
   const onMediaStreamRequest = useCallback((stream) => {

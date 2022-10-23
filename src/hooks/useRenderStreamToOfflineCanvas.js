@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from "react";
 import useRenderer from "../hooks/useRenderer";
+import { SEGMENTER_CONFIG } from "../constants";
 
 /* Tensor flow */
 import "@tensorflow/tfjs-core";
@@ -8,7 +9,12 @@ import * as bodySegmentation from "@tensorflow-models/body-segmentation";
 import "@mediapipe/selfie_segmentation/selfie_segmentation";
 import "@tensorflow/tfjs-converter";
 
-export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
+export default function useRenderStreamToOfflineCanvas(
+  canvas,
+  stream,
+  params,
+  chromeExtensionBase
+) {
   const videoRef = useRef(null);
   const glContextRef = useRef(null);
   const hasInitializedRenderer = useRef(false);
@@ -22,17 +28,16 @@ export default function useRenderStreamToOfflineCanvas(canvas, stream, params) {
       return;
     }
     const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
-    const segmenterConfig = {
-      runtime: "tfjs", // mediapipe/tfjs
-      modelType: "general",
+
+    const config = {
+      ...SEGMENTER_CONFIG,
+      modelUrl: chromeExtensionBase + "build/segmentation_model.json",
     };
 
-    bodySegmentation
-      .createSegmenter(model, segmenterConfig)
-      .then((segmenter) => {
-        segmenterRef.current = segmenter;
-      });
-  }, []);
+    bodySegmentation.createSegmenter(model, config).then((segmenter) => {
+      segmenterRef.current = segmenter;
+    });
+  }, [chromeExtensionBase]);
 
   const onVideoPlay = useCallback(() => {
     videoRef.current.width = videoRef.current.videoWidth;
