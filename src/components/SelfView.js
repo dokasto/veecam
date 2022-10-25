@@ -18,7 +18,7 @@ const useStyles = createUseStyles({
   background: {
     position: "absolute",
     zIndex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#333333",
     width: "100%",
     height: "97%",
     color: "#fff",
