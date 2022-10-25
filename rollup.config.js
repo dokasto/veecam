@@ -33,6 +33,34 @@ export default [
       format: "cjs",
       plugins: [terser()],
     },
+    plugins: [
+      // eslint-disable-next-line no-undef
+      process.env.NODE_ENV === "production" && terser(),
+      babel({
+        exclude: "node_modules/**",
+        babelHelpers: "bundled",
+        presets: ["@babel/env", "@babel/preset-react"],
+        extensions: [".js"],
+      }),
+      nodeResolve({
+        browser: true,
+        modulePaths: ["node_modules/@tensorflow/**"],
+      }),
+      commonjs({
+        include: ["node_modules/**"],
+        requireReturnsDefault: true,
+      }),
+      json(),
+      glslify(),
+      replace({
+        preventAssignment: true,
+        // eslint-disable-next-line no-undef
+        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+      }),
+      postcss({
+        plugins: [autoprefixer()],
+      }),
+    ],
   },
   {
     input: "src/scripts/inject.js",
