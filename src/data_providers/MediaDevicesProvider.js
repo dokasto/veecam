@@ -10,7 +10,6 @@ import PropTypes from "prop-types";
 import { getStoredDevicePrefs, saveDevicePrefs } from "../utils/storage";
 import useErrorLogger from "../hooks/useErrorLogger";
 
-// TODO Fix first run case when no device is available
 export default function MediaDevicesProvider({ children }) {
   const [devices, _setDevices] = useState([]);
   const [video, _setVideo] = useState(null);
