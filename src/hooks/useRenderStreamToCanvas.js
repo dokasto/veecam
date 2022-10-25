@@ -46,13 +46,22 @@ export default function useRenderStreamToCanvas(canvas, stream) {
     }
 
     videoRef.current.addEventListener("playing", onVideoPlay);
-    videoRef.current.srcObject = stream;
-    videoRef.current.play();
+
+    try {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play();
+    } catch (e) {
+      console.info(e);
+    }
 
     () => {
       videoRef.current.removeEventListener("playing", onVideoPlay);
-      videoRef.current.srcObject = null;
-      videoRef.current.stop();
+      try {
+        videoRef.current.srcObject = null;
+        videoRef.current.stop();
+      } catch (e) {
+        console.info(e);
+      }
     };
   }, [onVideoPlay, stream]);
 

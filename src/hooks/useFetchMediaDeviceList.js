@@ -10,18 +10,20 @@ export default function useFetchMediaDeviceList() {
   const logError = useErrorLogger();
 
   useEffect(() => {
-    if (hasFetchedDevices.current && stream != null) {
-      return;
+    if (!hasFetchedDevices.current && stream != null) {
+      navigator.mediaDevices
+        .enumerateDevices()
+        .then((deviceList) => {
+          setDevices(deviceList.filter((device) => device.deviceId.length > 0));
+          hasFetchedDevices.current = true;
+        })
+        .catch((err) => {
+          logError(
+            "useFetchMediaDeviceList",
+            "Unable to fetch device list",
+            err
+          );
+        });
     }
-    hasFetchedDevices.current = true;
-
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((deviceList) => {
-        setDevices(deviceList.filter((device) => device.deviceId.length > 0));
-      })
-      .catch((err) => {
-        logError("useFetchMediaDeviceList", "Unable to fetch device list", err);
-      });
   }, [logError, setDevices, stream]);
 }
