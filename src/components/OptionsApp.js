@@ -27,6 +27,11 @@ const useStyles = createUseStyles({
   controls: {
     flex: 1,
   },
+  contact: {
+    marginTop: 12,
+    fontWeight: "bold",
+    fontSize: 17,
+  },
 });
 
 export default function OptionsApp() {
@@ -45,7 +50,7 @@ export default function OptionsApp() {
           <ColorControls />
         </div>
       </div>
-      <div>filters</div>
+      <div className={classes.contact}>contact: dokasto.labs@gmail.com</div>
     </div>
   );
 }
