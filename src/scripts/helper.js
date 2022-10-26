@@ -27,7 +27,8 @@ export function monkeyPatchGetUserMedia(
   virtualDeviceId,
   devicePrefs,
   callback,
-  canvas
+  canvas,
+  onVirtualCamSelected
 ) {
   const getUserMediaFn = navigator.mediaDevices.getUserMedia.bind(
     navigator.mediaDevices
@@ -49,6 +50,7 @@ export function monkeyPatchGetUserMedia(
                 };
           getUserMediaFn(processedConstraints)
             .then((stream) => {
+              onVirtualCamSelected();
               callback(stream);
               if (soureVideoDeviceId == null) {
                 resolve(stream);
@@ -68,7 +70,10 @@ export function monkeyPatchGetUserMedia(
                 return captureStream;
               }
             })
-            .catch(reject);
+            .catch((e) => {
+              onVirtualCamSelected(e);
+              reject(e);
+            });
         });
       } else {
         getUserMediaFn(constraints).then(resolve).catch(reject);

@@ -25,5 +25,8 @@
       "resources": ["/build/*"],
       "matches": ["https://*/*"]
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'"
+  }
 }

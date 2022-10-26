@@ -4,12 +4,14 @@ import {
 } from "../utils/storage";
 import { EXTENSION_SCRIPT_TAG_ID } from "../constants";
 
-const script = document.createElement("script");
-
-script.setAttribute("type", "module");
-script.setAttribute("id", EXTENSION_SCRIPT_TAG_ID);
-// eslint-disable-next-line no-undef
-script.setAttribute("src", chrome.runtime.getURL("build/inject.js"));
+const extensionScript = createScript(
+  // eslint-disable-next-line no-undef
+  chrome.runtime.getURL("build/inject.js"),
+  EXTENSION_SCRIPT_TAG_ID
+);
+const googleAnalyticsScript = createScript(
+  "https://www.googletagmanager.com/gtag/js?id=G-YSB1Z3YLZH"
+);
 
 const head =
   document.head ||
@@ -18,7 +20,7 @@ const head =
 
 Promise.all([getStoredColorCorrectionPrefs(), getStoredDevicePrefs()]).then(
   (prefs) => {
-    script.setAttribute(
+    extensionScript.setAttribute(
       "prefs",
       JSON.stringify({
         colorCorrectionPrefs: prefs[0],
@@ -27,6 +29,17 @@ Promise.all([getStoredColorCorrectionPrefs(), getStoredDevicePrefs()]).then(
         chromeExtensionBase: chrome.runtime.getURL("/"),
       })
     );
-    head.insertBefore(script, head.lastChild);
+    head.insertBefore(googleAnalyticsScript, head.lastChild);
+    head.insertBefore(extensionScript, head.lastChild);
   }
 );
+
+function createScript(src, id = "") {
+  const script = document.createElement("script");
+  script.setAttribute("type", "text/javascript");
+  script.setAttribute("id", id);
+  // eslint-disable-next-line no-undef
+  script.setAttribute("src", src);
+
+  return script;
+}
