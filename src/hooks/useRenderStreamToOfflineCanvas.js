@@ -55,7 +55,12 @@ export default function useRenderStreamToOfflineCanvas(
       try {
         videoRef.current.autoplay = true;
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+
+        const playPromise = videoRef.current.play();
+
+        if (playPromise != null) {
+          playPromise.then().catch(() => {});
+        }
       } catch (e) {
         console.info(e);
       }

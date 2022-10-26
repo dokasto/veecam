@@ -16,17 +16,6 @@ const VIRTUAL_DEVICE = {
   kind: "videoinput",
 };
 
-window.dataLayer = window.dataLayer || [];
-function gtag() {
-  try {
-    dataLayer.push(arguments);
-  } catch (e) {
-    console.info(e);
-  }
-}
-gtag("js", new Date());
-gtag("config", "G-YSB1Z3YLZH");
-
 function Root({ prefs }) {
   monkeyPatchEnumerateDevices(VIRTUAL_DEVICE);
 
@@ -46,12 +35,8 @@ function Root({ prefs }) {
     setMediaStream(stream);
   }, []);
 
-  const onVirtualCamSelected = useCallback((err) => {
-    gtag("event", "camera_selected", {
-      event_category: "engagement",
-      event_label: "Camera Selected",
-      value: err == null ? "successful" : "error",
-    });
+  const onVirtualCamSelected = useCallback(() => {
+    // track this somehow
   }, []);
 
   monkeyPatchGetUserMedia(

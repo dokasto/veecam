@@ -2,12 +2,12 @@
   "name": "VeeCam",
   "description": "A virtual camera Chrome extension.",
   "version": "0.0.1",
-  "minimum_chrome_version": "10.0",
+  "minimum_chrome_version": "88",
   "manifest_version": 3,
   "background": {
     "service_worker": "build/background.js"
   },
-  "permissions": ["scripting", "storage"],
+  "permissions": ["tabs", "scripting", "storage"],
   "action": {
     "default_popup": "src/views/popup.html"
   },
@@ -27,6 +27,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self' 'unsafe-inline' https://region1.google-analytics.com/;"
   }
 }

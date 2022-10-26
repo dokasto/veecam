@@ -93,7 +93,10 @@ export default [
         "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
       }),
       copy({
-        targets: [{ src: "src/models/*", dest: "build" }],
+        targets: [
+          { src: "src/models/*", dest: "build" },
+          { src: "src/external_scripts/*", dest: "build" },
+        ],
       }),
     ],
   },

@@ -3,14 +3,12 @@ import {
   getStoredDevicePrefs,
 } from "../utils/storage";
 import { EXTENSION_SCRIPT_TAG_ID } from "../constants";
+import { createScript } from "../utils/helpers";
 
 const extensionScript = createScript(
   // eslint-disable-next-line no-undef
   chrome.runtime.getURL("build/inject.js"),
   EXTENSION_SCRIPT_TAG_ID
-);
-const googleAnalyticsScript = createScript(
-  "https://www.googletagmanager.com/gtag/js?id=G-YSB1Z3YLZH"
 );
 
 const head =
@@ -29,17 +27,11 @@ Promise.all([getStoredColorCorrectionPrefs(), getStoredDevicePrefs()]).then(
         chromeExtensionBase: chrome.runtime.getURL("/"),
       })
     );
-    head.insertBefore(googleAnalyticsScript, head.lastChild);
-    head.insertBefore(extensionScript, head.lastChild);
+
+    try {
+      head.insertBefore(extensionScript, head.lastChild);
+    } catch (e) {
+      console.info(e);
+    }
   }
 );
-
-function createScript(src, id = "") {
-  const script = document.createElement("script");
-  script.setAttribute("type", "text/javascript");
-  script.setAttribute("id", id);
-  // eslint-disable-next-line no-undef
-  script.setAttribute("src", src);
-
-  return script;
-}

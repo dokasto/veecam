@@ -2,9 +2,11 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import Popup from "../components/Popup";
 
-// TODO Beta test
 // TODO Make demo video and instructions
+// TODO Beta test
 // TODO Ship extension
+
+initGA();
 
 function Root() {
   return <Popup />;
