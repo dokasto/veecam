@@ -6,8 +6,6 @@ import Popup from "../components/Popup";
 // TODO Beta test
 // TODO Ship extension
 
-initGA();
-
 function Root() {
   return <Popup />;
 }
