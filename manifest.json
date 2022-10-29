@@ -9,9 +9,9 @@
   },
   "permissions": ["tabs", "scripting", "storage"],
   "action": {
-    "default_popup": "src/views/popup.html"
+    "default_popup": "build/popup.html"
   },
-  "options_page": "src/views/options.html",
+  "options_page": "build/options.html",
   "content_scripts": [
     {
       "matches": ["https://*/*"],

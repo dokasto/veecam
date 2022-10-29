@@ -95,6 +95,7 @@ export default [
       copy({
         targets: [
           { src: "src/models/*", dest: "build" },
+          { src: "src/views/*", dest: "build" },
           { src: "src/external_scripts/*", dest: "build" },
         ],
       }),
