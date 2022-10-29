@@ -106,13 +106,14 @@ export default function useRenderStreamToOfflineCanvas(
       videoRef.current != null &&
       videoRef.current.videoWidth > 0
     ) {
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      offScreenCanvasRef.current.width = videoRef.current.videoWidth;
-      offScreenCanvasRef.current.height = videoRef.current.videoHeight;
       rendererRef.current.init(glContextRef.current);
       hasInitializedRenderer.current = true;
     }
+
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    offScreenCanvasRef.current.width = videoRef.current.videoWidth;
+    offScreenCanvasRef.current.height = videoRef.current.videoHeight;
 
     const isVideoReady =
       hasInitializedRenderer.current && videoRef.current.videoWidth > 0;
