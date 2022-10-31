@@ -1,6 +1,6 @@
 # VeeCam
 
-A proof-of-concept virtual camera chrome extension that lets you adjust your video appearance in a video conference call. 
+A proof-of-concept virtual camera chrome extension that lets you adjust how your video appears to everyone else on the call . 
 It currently works with Google Meet.
 
 ## How To Install
