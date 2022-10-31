@@ -12,8 +12,9 @@ import "@tensorflow/tfjs-converter";
 export default function useRenderStreamToOfflineCanvas(
   canvas,
   stream,
-  params,
-  chromeExtensionBase
+  colorCorrectionParams,
+  chromeExtensionBase,
+  shouldStart
 ) {
   const videoRef = useRef(null);
   const glContextRef = useRef(null);
@@ -22,9 +23,16 @@ export default function useRenderStreamToOfflineCanvas(
   const requestAnimationFrameRef = useRef(null);
   const rendererRef = useRef(useRenderer());
   const offScreenCanvasRef = useRef(document.createElement("canvas"));
+  const params = colorCorrectionParams ?? {
+    blur: 0,
+    brightness: -0.34,
+    contrast: -0.7,
+    exposure: -0.34,
+    saturation: 0,
+  };
 
   useEffect(() => {
-    if (segmenterRef.current != null) {
+    if (segmenterRef.current != null || !shouldStart) {
       return;
     }
     const model = bodySegmentation.SupportedModels.MediaPipeSelfieSegmentation;
@@ -37,7 +45,7 @@ export default function useRenderStreamToOfflineCanvas(
     bodySegmentation.createSegmenter(model, config).then((segmenter) => {
       segmenterRef.current = segmenter;
     });
-  }, [chromeExtensionBase]);
+  }, [chromeExtensionBase, shouldStart]);
 
   const onVideoPlay = useCallback(() => {
     videoRef.current.width = videoRef.current.videoWidth;
@@ -48,6 +56,10 @@ export default function useRenderStreamToOfflineCanvas(
   useEffect(() => {
     if (videoRef.current == null) {
       videoRef.current = document.createElement("video");
+    }
+
+    if (!shouldStart) {
+      return;
     }
 
     if (stream != null) {
@@ -74,11 +86,11 @@ export default function useRenderStreamToOfflineCanvas(
         console.info(e);
       }
     };
-  }, [onVideoPlay, stream]);
+  }, [onVideoPlay, shouldStart, stream]);
 
   // set WebGL ref only once
   useEffect(() => {
-    if (!(glContextRef.current == null && canvas != null)) {
+    if (!(glContextRef.current == null && canvas != null) || !shouldStart) {
       return;
     }
     glContextRef.current = canvas.getContext("webgl");
@@ -86,17 +98,20 @@ export default function useRenderStreamToOfflineCanvas(
     return () => {
       glContextRef.current = null;
     };
-  }, [canvas]);
+  }, [canvas, shouldStart]);
 
   // destroy renderer
   useEffect(() => {
+    if (!shouldStart) {
+      return;
+    }
     return () => {
       if (hasInitializedRenderer.current) {
         rendererRef.current.destroy();
         hasInitializedRenderer.current = false;
       }
     };
-  }, []);
+  }, [shouldStart]);
 
   const loop = useCallback(async () => {
     // first initialize renderer
@@ -161,6 +176,9 @@ export default function useRenderStreamToOfflineCanvas(
 
   // run render loop
   useEffect(() => {
+    if (!shouldStart) {
+      return;
+    }
     if (requestAnimationFrameRef.current == null) {
       requestAnimationFrameRef.current = window.requestAnimationFrame(loop);
     }
@@ -169,5 +187,5 @@ export default function useRenderStreamToOfflineCanvas(
       window.cancelAnimationFrame(requestAnimationFrameRef.current);
       requestAnimationFrameRef.current = null;
     };
-  }, [loop]);
+  }, [loop, shouldStart]);
 }

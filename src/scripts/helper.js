@@ -40,7 +40,7 @@ export function monkeyPatchGetUserMedia(
         getSourceVideoId(devicePrefs, (soureVideoDeviceId) => {
           const processedConstraints =
             soureVideoDeviceId == null
-              ? { ...constraints }
+              ? { ...constraints, video: "video" in constraints }
               : {
                   ...constraints,
                   video: {
@@ -98,13 +98,13 @@ function shouldIntercept(constraints, virtualDeviceId) {
 
 function getSourceVideoId(devicePrefs, callback) {
   navigator.mediaDevices.enumerateDevices().then((devices) => {
-    const intendedDevice = devicePrefs.devices.find(
+    const intendedDevice = devicePrefs?.devices.find(
       (device) => device.deviceId === devicePrefs.video
     );
     for (const device of devices) {
       if (
-        device.label === intendedDevice.label &&
-        device.kind === intendedDevice.kind
+        device.label === intendedDevice?.label &&
+        device.kind === intendedDevice?.kind
       ) {
         callback(device.deviceId);
         return;

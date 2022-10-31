@@ -20,6 +20,7 @@ function Root({ prefs }) {
   monkeyPatchEnumerateDevices(VIRTUAL_DEVICE);
 
   const [mediaStream, setMediaStream] = useState(null);
+  const shouldStart = useRef(false);
 
   // create offscreen canvas
   const canvasRef = useRef(document.createElement("canvas"));
@@ -28,7 +29,8 @@ function Root({ prefs }) {
     canvasRef.current,
     mediaStream,
     prefs.colorCorrectionPrefs,
-    prefs.chromeExtensionBase
+    prefs.chromeExtensionBase,
+    shouldStart.current
   );
 
   const onMediaStreamRequest = useCallback((stream) => {
@@ -36,7 +38,7 @@ function Root({ prefs }) {
   }, []);
 
   const onVirtualCamSelected = useCallback(() => {
-    // track this somehow
+    shouldStart.current = true;
   }, []);
 
   monkeyPatchGetUserMedia(
