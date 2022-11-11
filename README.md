@@ -4,7 +4,7 @@ A proof-of-concept virtual camera chrome extension that lets you adjust how your
 It currently works with Google Meet.
 
 ## How To Install
-https://user-images.githubusercontent.com/3197630/198825114-de75630c-7c28-46fd-a184-fddbc9094fa3.mp4
+https://chrome.google.com/webstore/detail/veecam/ndmjmamencpnepijcpkekefjpjfldidk/related?hl=en&authuser=0
 
 
 ## How to Use
