@@ -8,6 +8,16 @@ import json from "@rollup/plugin-json";
 import glslify from "rollup-plugin-glslify";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import copy from "rollup-plugin-copy";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const ENV_VALUES =  {
+  'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+  'process.env.GA_MEASUREMENT_ID': JSON.stringify(process.env.GA_MEASUREMENT_ID),
+  'process.env.GA_API_SECRET': JSON.stringify(process.env.GA_API_SECRET),
+  'process.env.GA_ENDPOINT': JSON.stringify(process.env.GA_ENDPOINT),
+}
 
 export default [
   {
@@ -54,8 +64,7 @@ export default [
       glslify(),
       replace({
         preventAssignment: true,
-        // eslint-disable-next-line no-undef
-        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+        values: {...ENV_VALUES}
       }),
       postcss({
         plugins: [autoprefixer()],
@@ -89,8 +98,7 @@ export default [
       glslify(),
       replace({
         preventAssignment: true,
-        // eslint-disable-next-line no-undef
-        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+        values: {...ENV_VALUES}
       }),
       copy({
         targets: [
@@ -128,8 +136,7 @@ export default [
       glslify(),
       replace({
         preventAssignment: true,
-        // eslint-disable-next-line no-undef
-        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+        values: {...ENV_VALUES}
       }),
       postcss({
         plugins: [autoprefixer()],

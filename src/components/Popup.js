@@ -1,5 +1,6 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { createUseStyles } from "react-jss";
+import useGALogger from "../hooks/useGALogger";
 
 const useStyles = createUseStyles({
   "@global": {
@@ -34,6 +35,11 @@ const useStyles = createUseStyles({
 
 export default function Popup() {
   const classes = useStyles();
+  const { logPopupImpression } = useGALogger();
+
+  useEffect(() => {
+    logPopupImpression();
+  }, [logPopupImpression]);
 
   const onClick = useCallback(() => {
     // eslint-disable-next-line no-undef

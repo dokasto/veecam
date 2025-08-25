@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import VideoSource from "./VideoSource";
 import SelfView from "./SelfView";
 import ColorControls from "../components/ColorControls";
 import { useFetchMediaStream } from "../hooks/mediaStreamHooks";
 import useFetchMediaDeviceList from "../hooks/useFetchMediaDeviceList";
+import useGALogger from "../hooks/useGALogger";
 
 const useStyles = createUseStyles({
   root: {
@@ -36,8 +37,15 @@ const useStyles = createUseStyles({
 
 export default function OptionsApp() {
   const classes = useStyles();
+  const { logPreferencePageImpression } = useGALogger();
+  
   useFetchMediaStream();
   useFetchMediaDeviceList();
+
+  useEffect(() => {
+    logPreferencePageImpression();
+  }, [logPreferencePageImpression]);
+
   return (
     <div className={classes.root}>
       <h3 className={classes.preferences}>Preferences</h3>

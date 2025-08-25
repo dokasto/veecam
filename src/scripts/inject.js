@@ -8,6 +8,7 @@ import {
   monkeyPatchEnumerateDevices,
   monkeyPatchGetUserMedia,
 } from "./helper.js";
+import useGALogger from "../hooks/useGALogger";
 
 const VIRTUAL_DEVICE = {
   deviceId: generateUniqueID(),
@@ -21,7 +22,7 @@ function Root({ prefs }) {
 
   const [mediaStream, setMediaStream] = useState(null);
   const shouldStart = useRef(false);
-
+  const { logVirtualCameraUsage } = useGALogger();
   // create offscreen canvas
   const canvasRef = useRef(document.createElement("canvas"));
 
@@ -39,7 +40,8 @@ function Root({ prefs }) {
 
   const onVirtualCamSelected = useCallback(() => {
     shouldStart.current = true;
-  }, []);
+    logVirtualCameraUsage();
+  }, [logVirtualCameraUsage]);
 
   monkeyPatchGetUserMedia(
     VIRTUAL_DEVICE.deviceId,

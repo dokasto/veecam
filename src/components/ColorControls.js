@@ -1,6 +1,8 @@
 import { createUseStyles } from "react-jss";
 import React, { useContext, useCallback, useRef, useEffect } from "react";
 import ColorCorrectionContext from "../data_providers/ColorCorrectionContext";
+import useGALogger from "../hooks/useGALogger";
+import debounce from "lodash.debounce";
 
 const useStyles = createUseStyles({
   root: {
@@ -46,30 +48,39 @@ export default function ColorControls() {
     setExposureRef,
   } = useContext(ColorCorrectionContext);
 
+  const { logPreferenceChange } = useGALogger();
+
   const blurRef = useRef(null);
   const exposureRef = useRef(null);
   const contrastRef = useRef(null);
   const saturationRef = useRef(null);
   const brightnessRef = useRef(null);
 
+  const debouncedLogPreferenceChange = useRef(debounce(logPreferenceChange, 500)).current;
+
   const onBlurChange = (e) => {
     setBlur(e.target.value);
+    debouncedLogPreferenceChange({ preference: 'blur' });
   };
 
   const onExposureChange = (e) => {
     setExposure(e.target.value);
+    debouncedLogPreferenceChange({ preference: 'exposure' });
   };
 
   const onContrastChange = (e) => {
     setContrast(e.target.value);
+    debouncedLogPreferenceChange({ preference: 'contrast' });
   };
 
   const onBrightnessChange = (e) => {
     setBrightness(e.target.value);
+    debouncedLogPreferenceChange({ preference: 'brightness' });
   };
 
   const onSaturationChange = (e) => {
     setSaturation(e.target.value);
+    debouncedLogPreferenceChange({ preference: 'saturation' });
   };
 
   useEffect(() => {
