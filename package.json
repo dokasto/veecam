@@ -1,6 +1,6 @@
 {
   "name": "Veecam",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "scripts": {
     "build": "NODE_ENV='production' rollup -c",
     "dev": "NODE_ENV='development' rollup -c -w"
