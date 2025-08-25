@@ -13,6 +13,7 @@ const EVENTS = {
     PREFERENCE_CHANGE: 'preference_change',
     VIRTUAL_CAMERA_USAGE: 'virtual_camera_usage',
     ERROR: 'error',
+    STRIPE_LINK_CLICK: 'stripe_link_click',
 };
 
 export default function useGALogger() {
@@ -65,7 +66,6 @@ export default function useGALogger() {
 
     const logEvent = useCallback(async ({ name, params = {} }) => {
         try {
-            console.log('Logging event to GA:', { GA_ENDPOINT, GA_MEASUREMENT_ID, GA_API_SECRET });
             await fetch(
                 `${GA_ENDPOINT}?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_API_SECRET}`,
                 {
@@ -114,6 +114,10 @@ export default function useGALogger() {
         logEvent({ name: EVENTS.ERROR, params: { error, source, label } }).then();
     }, [logEvent]);
 
+    const logStripeLinkClick = useCallback(() => {
+        logEvent({ name: EVENTS.STRIPE_LINK_CLICK }).then();
+    }, [logEvent]);
+
     return {
         logPopupImpression,
         logPreferencePageImpression,
@@ -121,5 +125,6 @@ export default function useGALogger() {
         logPreferenceChange,
         logVirtualCameraUsage,
         logError,
+        logStripeLinkClick,
     };
 }

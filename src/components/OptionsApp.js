@@ -6,6 +6,7 @@ import ColorControls from "../components/ColorControls";
 import { useFetchMediaStream } from "../hooks/mediaStreamHooks";
 import useFetchMediaDeviceList from "../hooks/useFetchMediaDeviceList";
 import useGALogger from "../hooks/useGALogger";
+import Upsell from "./Upsell";
 
 const useStyles = createUseStyles({
   root: {
@@ -38,7 +39,7 @@ const useStyles = createUseStyles({
 export default function OptionsApp() {
   const classes = useStyles();
   const { logPreferencePageImpression } = useGALogger();
-  
+
   useFetchMediaStream();
   useFetchMediaDeviceList();
 
@@ -48,6 +49,7 @@ export default function OptionsApp() {
 
   return (
     <div className={classes.root}>
+      <Upsell />
       <h3 className={classes.preferences}>Preferences</h3>
       <div className={classes.middle}>
         <div className={classes.camera}>
