@@ -273,7 +273,7 @@ Now I am building a new desktop-only video conferencing app from the ground up, 
               <div className={classes.offerTitle}>🎉 Special Launch Offer!</div>
               <div className={classes.offerText}>
                 We're giving our first 50 users a <strong>one-year subscription for just $15</strong>!
-                That's less than $1.25 per month for premium AI features. Plus, you get a full refund anytime - no questions asked.
+                You get a full refund anytime - no questions asked.
               </div>
               <a
                 href="https://veecam.ai/signup"
