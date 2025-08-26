@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { createUseStyles } from "react-jss";
 import useGALogger from "../hooks/useGALogger";
+import { 
+  FaRocket, 
+  FaVideo, 
+  FaStickyNote, 
+  FaSearch, 
+  FaClosedCaptioning, 
+  FaRobot, 
+  FaLock, 
+  FaGift 
+} from "react-icons/fa";
 
 const useStyles = createUseStyles({
   banner: {
@@ -174,6 +184,22 @@ const useStyles = createUseStyles({
     borderRadius: "50%",
     zIndex: 1,
   },
+  icon: {
+    marginRight: "8px",
+    verticalAlign: "middle",
+    fontSize: "16px",
+  },
+  titleIcon: {
+    marginRight: "8px",
+    verticalAlign: "middle",
+    fontSize: "20px",
+  },
+  featureIcon: {
+    marginRight: "8px",
+    verticalAlign: "middle",
+    fontSize: "14px",
+    color: "#FFD700",
+  },
 });
 
 const STORAGE_KEY = 'veecam_upsell_banner_expanded';
@@ -229,17 +255,18 @@ export default function Upsell() {
               onClick={handleToggleExpand}
               title="Collapse"
             >
-              −
+              -
             </button>
           </div>
           <div className={classes.bannerContent}>
             <h2 className={classes.title}>
-              🚀 <span className={classes.highlight}>VeeCam</span> is Evolving!
+              <FaRocket className={classes.titleIcon} />
+              <span className={classes.highlight}>VeeCam</span> is Evolving!
             </h2>
             <p className={classes.subtitle}>
-            After five years building video tools at big tech, I was frustrated that I could not even improve my own self-view on calls. So I built VeeCam. It started as a plugin, but after hearing from users, I knew AI had to be part of the foundation, not an afterthought.
+            After five years building video conferencing technology at Meta, I was frustrated I couldn't even adjust my own self-view to look better on calls. I built VeeCam to fix that. It started as a plugin, but user feedback made it clear: to deliver the experience people wanted, we had to own the full stack and rethink video calling from scratch.
             <br /><br />
-Now I am building a new desktop-only video conferencing app from the ground up, designed to use AI to power the core calling experience. Everything runs entirely on your computer - no ChatGPT keys, no cloud services, no sending your video or audio to external servers. That means faster performance, more privacy, and a better experience at a fraction of the cost of Zoom or Google Meet.
+            Now I'm building a desktop-only video conferencing app with AI running fully on-device, optimised for modern hardware. Everything runs locally, enabling better performance, strong privacy, and smarter in-call features that surpass those of Zoom or Google Meet.
             </p>
 
             <div className={classes.expandedContent}>
@@ -249,28 +276,37 @@ Now I am building a new desktop-only video conferencing app from the ground up, 
 
               <ul className={classes.features}>
                 <li className={classes.feature}>
-                  🎥 AI video enhancement with better self-view — look your best on every call
+                  <FaVideo className={classes.featureIcon} />
+                  AI video enhancement with better self-view - look your best on every call
                 </li>
                 <li className={classes.feature}>
-                  📝 Smart note-taking — automatically records what's said and identifies who said it
+                  <FaStickyNote className={classes.featureIcon} />
+                  Smart note-taking - automatically records what's said and identifies who said it
                 </li>
                 <li className={classes.feature}>
-                  🔍 Search past meeting notes — find any conversation or topic instantly
+                  <FaSearch className={classes.featureIcon} />
+                  Search past meeting notes - find any conversation or topic instantly
                 </li>
                 <li className={classes.feature}>
-                  🎬 Close captions — real-time transcription during calls
+                  <FaClosedCaptioning className={classes.featureIcon} />
+                  Close captions - real-time transcription during calls
                 </li>
                 <li className={classes.feature}>
-                  🤖 AI meeting summaries — get key points and action items instantly after each call
+                  <FaRobot className={classes.featureIcon} />
+                  Smart meeting summaries - get key points and action items instantly after each call
                 </li>
                 <li className={classes.feature}>
-                  🔒 100% private — everything runs on your computer, no data sent to the cloud
+                  <FaLock className={classes.featureIcon} />
+                  100% private - everything runs on your computer.
                 </li>
               </ul>
             </div>
 
             <div className={classes.offer}>
-              <div className={classes.offerTitle}>🎉 Special Launch Offer!</div>
+              <div className={classes.offerTitle}>
+                <FaGift className={classes.icon} />
+                Special Launch Offer!
+              </div>
               <div className={classes.offerText}>
                 We're giving our first 50 users a <strong>one-year subscription for just $15</strong>!
                 You get a full refund anytime - no questions asked.
@@ -282,7 +318,8 @@ Now I am building a new desktop-only video conferencing app from the ground up, 
                 className={classes.signupButton}
                 onClick={handleSpecialOfferClick}
               >
-                🚀 Claim Your Spot - $15/year
+                <FaRocket className={classes.icon} />
+                Claim Your Spot - $15/year
               </a>
             </div>
           </div>
@@ -291,7 +328,8 @@ Now I am building a new desktop-only video conferencing app from the ground up, 
         <>
           <div className={classes.collapsedContent}>
             <h3 className={classes.collapsedTitle}>
-              🚀 <span className={classes.highlight}>VeeCam</span> is Evolving!
+              <FaRocket className={classes.titleIcon} />
+              <span className={classes.highlight}>VeeCam</span> is Evolving!
             </h3>
             <p className={classes.collapsedSubtitle}>
               Better video calling with AI features - $15/year for first 50 users

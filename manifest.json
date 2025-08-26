@@ -1,7 +1,7 @@
 {
   "name": "VeeCam",
   "description": "A virtual camera Chrome extension.",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "minimum_chrome_version": "88",
   "manifest_version": 3,
   "background": {
